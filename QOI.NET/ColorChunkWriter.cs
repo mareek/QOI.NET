@@ -4,10 +4,14 @@ using System.IO;
 
 namespace QOI.NET
 {
-    internal class ColorChunkWriter
+    internal class ColorChunkWriter : IChunkWriter
     {
-        public void Write(Color pixel, Stream stream)
+        public bool CanHandlePixel(Color[] pixels, int currentPixel) => true;
+
+        public void WriteChunk(Color[] pixels, ref int currentPixel, Stream stream)
         {
+            var pixel = pixels[currentPixel++];
+
             Span<byte> buffer = stackalloc byte[5];
 
             buffer[0] = 0b1111_1111;

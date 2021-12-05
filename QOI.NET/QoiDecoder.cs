@@ -7,14 +7,14 @@ namespace QOI.NET
 {
     public class QoiDecoder
     {
-        private readonly ColorChunkReader _colorChunkReader = new();
+        private readonly IChunkReader[] _chunkReaders = { new Run8ChunkReader(), new ColorChunkReader() };
 
         public Bitmap Read(Stream stream)
         {
-            Span<byte> header = stackalloc byte[FromatConstants.HeaderLength];
+            Span<byte> header = stackalloc byte[FormatConstants.HeaderLength];
             stream.Read(header);
 
-            if (!header[0..4].SequenceEqual(FromatConstants.MagicBytes))
+            if (!header[0..4].SequenceEqual(FormatConstants.MagicBytes))
                 throw new FormatException("This is not a valid QOI image");
 
             var width = BinaryPrimitives.ReadUInt32BigEndian(header[4..8]);
@@ -27,11 +27,10 @@ namespace QOI.NET
 
         private Color[] DecodePixels(Stream stream, uint width, uint height)
         {
-            uint pixelCount = height * width;
-            Color[] pixels = new Color[pixelCount];
+            Color[] pixels = new Color[(height * width)];
             Span<byte> chunkBuffer = stackalloc byte[5];
             var currentPixel = 0;
-            while (currentPixel < pixelCount)
+            while (currentPixel < pixels.Length)
             {
                 stream.Read(chunkBuffer[0..1]);
                 var chunkReader = ChunkReaderSelector(chunkBuffer[0]);
@@ -48,9 +47,15 @@ namespace QOI.NET
 
         private IChunkReader ChunkReaderSelector(byte tagByte)
         {
-            if ((tagByte >> 4) == 0b1111)
+            static bool CanReadChunk(IChunkReader chunkReader, byte tagByte)
+                => (tagByte >> (8 - chunkReader.TagBitLength)) == chunkReader.Tag;
+
+            foreach (var chunkReader in _chunkReaders)
             {
-                return _colorChunkReader;
+                if (CanReadChunk(chunkReader, tagByte))
+                {
+                    return chunkReader;
+                }
             }
             throw new NotImplementedException();
         }

@@ -7,24 +7,6 @@ namespace QOI.Test;
 
 public class IntegrationTest
 {
-    private static readonly Color[] SimpleColors =
-    {
-        Color.Chartreuse,
-        Color.Bisque,
-        Color.Aquamarine,
-        Color.OrangeRed,
-        Color.Crimson,
-        Color.LemonChiffon,
-        Color.PeachPuff,
-        Color.AntiqueWhite,
-        Color.BlanchedAlmond,
-        Color.CornflowerBlue,
-        Color.BurlyWood,
-        Color.Firebrick,
-        Color.RosyBrown,
-        Color.DeepSkyBlue,
-    };
-
     [Theory]
     [MemberData(nameof(GetImgTest))]
     public void FullCircleProcessTest(Bitmap imgTest)
@@ -47,57 +29,89 @@ public class IntegrationTest
         }
     }
 
+    [Fact]
+    public void TestCompressedSize()
+    {
+        QoiEncoder encoder = new();
+        Check.That(encoder.Write(GetBlankImage())).HasSize(FormatConstants.HeaderLength + 5 + 1 + 1);
+        Check.That(encoder.Write(GetRandomArgbImage())).HasSize(FormatConstants.HeaderLength + 5 * 8 * 6);
+        Check.That(encoder.Write(GetRandomStripedImage())).HasSize(FormatConstants.HeaderLength + (5 + 1) * 6);
+        //Check.That(encoder.Write(GetMonochromeStripedImage())).HasSize(FromatConstants.HeaderLength + 5 + 1 + 6);
+    }
+
     public static IEnumerable<object[]> GetImgTest()
     {
-        Bitmap blankImage = new(8, 6);
-        yield return new object[] { blankImage };
+        yield return new object[] { GetBlankImage() };
+        yield return new object[] { GetRandomArgbImage() };
+        yield return new object[] { GetMonochromeStripedImage() };
         yield return new object[] { GetRandomStripedImage() };
         yield return new object[] { GetRandomSimpleImage() };
-        yield return new object[] { GetRandomArgbImage() };
+    }
+
+    private static Bitmap GetBlankImage() => new(8, 6);
+
+    private static Bitmap GetRandomArgbImage()
+    {
+        Bitmap image = new(8, 6);
+        for (int y = 0; y < image.Height; y++)
+        {
+            for (int x = 0; x < image.Width; x++)
+            {
+                var color = GetRandomColor();
+                image.SetPixel(x, y, color);
+            }
+        }
+        return image;
+    }
+
+    private static Bitmap GetMonochromeStripedImage()
+    {
+        Color[] colors = { Color.Bisque, Color.Chartreuse };
+        Bitmap image = new(8, 6);
+        for (int y = 0; y < image.Height; y++)
+        {
+            var color = colors[y % 2];
+            for (int x = 0; x < image.Width; x++)
+            {
+                image.SetPixel(x, y, color);
+            }
+        }
+        return image;
     }
 
     private static Bitmap GetRandomStripedImage()
     {
-        Bitmap stripedImage = new(8, 6);
-        for (int y = 0; y < stripedImage.Height; y++)
+        Bitmap image = new(8, 6);
+        for (int y = 0; y < image.Height; y++)
         {
-            var color = SimpleColors[Random.Shared.Next(0, SimpleColors.Length)];
-            for (int x = 0; x < stripedImage.Width; x++)
+            Color color = GetRandomColor();
+            for (int x = 0; x < image.Width; x++)
             {
-                stripedImage.SetPixel(x, y, color);
+                image.SetPixel(x, y, color);
             }
         }
-        return stripedImage;
+        return image;
     }
 
     private static Bitmap GetRandomSimpleImage()
     {
-        Bitmap simpleImage = new(8, 6);
-        for (int y = 0; y < simpleImage.Height; y++)
+        Color[] colors = Enumerable.Range(0, 16).Select(_ => GetRandomColor()).ToArray();
+
+        Bitmap image = new(8, 6);
+        for (int y = 0; y < image.Height; y++)
         {
-            for (int x = 0; x < simpleImage.Width; x++)
+            for (int x = 0; x < image.Width; x++)
             {
-                var color = SimpleColors[Random.Shared.Next(0, SimpleColors.Length)];
-                simpleImage.SetPixel(x, y, color);
+                var color = colors[Random.Shared.Next(0, colors.Length)];
+                image.SetPixel(x, y, color);
             }
         }
-        return simpleImage;
+        return image;
     }
 
-    private static Bitmap GetRandomArgbImage()
-    {
-        Bitmap simpleImage = new(8, 6);
-        for (int y = 0; y < simpleImage.Height; y++)
-        {
-            for (int x = 0; x < simpleImage.Width; x++)
-            {
-                var color = Color.FromArgb(Random.Shared.Next(0, 256),
-                                           Random.Shared.Next(0, 256),
-                                           Random.Shared.Next(0, 256),
-                                           Random.Shared.Next(0, 256));
-                simpleImage.SetPixel(x, y, color);
-            }
-        }
-        return simpleImage;
-    }
+    private static Color GetRandomColor()
+        => Color.FromArgb(Random.Shared.Next(0, 256),
+                          Random.Shared.Next(0, 256),
+                          Random.Shared.Next(0, 256),
+                          Random.Shared.Next(0, 256));
 }

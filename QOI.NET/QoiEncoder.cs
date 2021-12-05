@@ -1,21 +1,21 @@
 ﻿using System;
 using System.Buffers.Binary;
-using System.Collections.Generic;
 using System.Drawing;
 using System.IO;
+using System.Linq;
 
 namespace QOI.NET
 {
     public class QoiEncoder
     {
-        private readonly ColorChunkWriter _colorChunkWriter = new();
+        private readonly IChunkWriter[] _chunkWriters = { new Run8ChunkWriter(), new ColorChunkWriter() };
 
         public byte[] Write(Bitmap image)
         {
             using var stream = new MemoryStream();
 
             WriteHeader(image, stream);
-            EncodePixels(image.GetPixels(), stream);
+            EncodePixels(image.GetPixels().ToArray(), stream);
 
             return stream.ToArray();
         }
@@ -35,8 +35,8 @@ namespace QOI.NET
             };
              */
 
-            stream.Write(FromatConstants.MagicBytes);
-            
+            stream.Write(FormatConstants.MagicBytes);
+
             Span<byte> widthBuffer = stackalloc byte[4];
             BinaryPrimitives.WriteUInt32BigEndian(widthBuffer, (uint)image.Width);
             stream.Write(widthBuffer);
@@ -49,12 +49,27 @@ namespace QOI.NET
             stream.WriteByte(0b0000_0000); //color space
         }
 
-        private void EncodePixels(IEnumerable<Color> pixels, Stream stream)
+        private void EncodePixels(Color[] pixels, Stream stream)
         {
-            foreach (var pixel in pixels)
+            var currentPixel = 0;
+            while (currentPixel < pixels.Length)
             {
-                _colorChunkWriter.Write(pixel, stream);
+                var chunkWriter = ChunkWriterSelector(pixels, currentPixel);
+                chunkWriter.WriteChunk(pixels, ref currentPixel, stream);
             }
+        }
+
+        private IChunkWriter ChunkWriterSelector(Color[] pixels, int currentPixel)
+        {
+            foreach (var chunkWriter in _chunkWriters)
+            {
+                if (chunkWriter.CanHandlePixel(pixels, currentPixel))
+                {
+                    return chunkWriter;
+                }
+            }
+
+            throw new NotImplementedException();
         }
     }
 }

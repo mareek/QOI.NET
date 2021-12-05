@@ -5,6 +5,8 @@ namespace QOI.NET
 {
     internal class ColorChunkReader : IChunkReader
     {
+        public byte Tag => 0b1111;
+        public byte TagBitLength => 4;
         public byte Length => 5;
 
         public void WritePixels(Color[] pixels, ref int currentPixel, Span<byte> chunk)
