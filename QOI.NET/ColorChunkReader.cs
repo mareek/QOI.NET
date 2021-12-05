@@ -1,0 +1,15 @@
+﻿using System;
+using System.Drawing;
+
+namespace QOI.NET
+{
+    internal class ColorChunkReader : IChunkReader
+    {
+        public byte Length => 5;
+
+        public void WritePixels(Color[] pixels, ref int currentPixel, Span<byte> chunk)
+        {
+            pixels[currentPixel++] = Color.FromArgb(chunk[4], chunk[1], chunk[2], chunk[3]);
+        }
+    }
+}
