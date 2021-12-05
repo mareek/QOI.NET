@@ -32,10 +32,11 @@ public class IntegrationTest
     [Fact]
     public void TestCompressedSize()
     {
+        const int HeaderLength = 14;
         QoiEncoder encoder = new();
-        Check.That(encoder.Write(GetBlankImage())).HasSize(FormatConstants.HeaderLength + 5 + 1 + 1);
-        Check.That(encoder.Write(GetRandomArgbImage())).HasSize(FormatConstants.HeaderLength + 5 * 8 * 6);
-        Check.That(encoder.Write(GetRandomStripedImage())).HasSize(FormatConstants.HeaderLength + (5 + 1) * 6);
+        Check.That(encoder.Write(GetBlankImage())).HasSize(HeaderLength + 5 + 1 + 1);
+        Check.That(encoder.Write(GetRandomArgbImage())).HasSize(HeaderLength + 5 * 8 * 6);
+        Check.That(encoder.Write(GetRandomStripedImage())).HasSize(HeaderLength + (5 + 1) * 6);
         //Check.That(encoder.Write(GetMonochromeStripedImage())).HasSize(FromatConstants.HeaderLength + 5 + 1 + 6);
     }
 

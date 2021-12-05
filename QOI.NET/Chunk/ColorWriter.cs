@@ -2,9 +2,9 @@
 using System.Drawing;
 using System.IO;
 
-namespace QOI.NET
+namespace QOI.NET.Chunk
 {
-    internal class ColorChunkWriter : IChunkWriter
+    internal class ColorWriter : IChunkWriter
     {
         public bool CanHandlePixel(Color[] pixels, int currentPixel) => true;
 

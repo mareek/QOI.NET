@@ -1,7 +1,7 @@
 ﻿using System;
 using System.Drawing;
 
-namespace QOI.NET
+namespace QOI.NET.Chunk
 {
     internal interface IChunkReader
     {

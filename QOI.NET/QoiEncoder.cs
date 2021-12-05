@@ -3,12 +3,13 @@ using System.Buffers.Binary;
 using System.Drawing;
 using System.IO;
 using System.Linq;
+using QOI.NET.Chunk;
 
 namespace QOI.NET
 {
     public class QoiEncoder
     {
-        private readonly IChunkWriter[] _chunkWriters = { new Run8ChunkWriter(), new ColorChunkWriter() };
+        private readonly IChunkWriter[] _chunkWriters = { new Run8Writer(), new ColorWriter() };
 
         public byte[] Write(Bitmap image)
         {
@@ -22,31 +23,7 @@ namespace QOI.NET
 
         private static void WriteHeader(Bitmap image, MemoryStream stream)
         {
-            /*
-             struct qoi_header_t {
-                char [4];       // magic bytes "qoif"
-                u32 width;      // image width in pixels (BE)
-                u32 height;     // image height in pixels (BE)
-                 u8 channels;   // must be 3 (RGB) or 4 (RGBA)
-                 u8 colorspace; // a bitmap 0000rgba where 
-                                //   - a zero bit indicates sRGBA, 
-                                //   - a one bit indicates linear (user interpreted)
-                                //   colorspace for each channel
-            };
-             */
-
-            stream.Write(FormatConstants.MagicBytes);
-
-            Span<byte> widthBuffer = stackalloc byte[4];
-            BinaryPrimitives.WriteUInt32BigEndian(widthBuffer, (uint)image.Width);
-            stream.Write(widthBuffer);
-
-            Span<byte> heightBuffer = stackalloc byte[4];
-            BinaryPrimitives.WriteUInt32BigEndian(heightBuffer, (uint)image.Height);
-            stream.Write(heightBuffer);
-
-            stream.WriteByte(4); //Channels
-            stream.WriteByte(0b0000_0000); //color space
+            HeaderHelper.WriteHeader(stream, (uint)image.Width, (uint)image.Height);
         }
 
         private void EncodePixels(Color[] pixels, Stream stream)

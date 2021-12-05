@@ -1,9 +1,9 @@
 ﻿using System.Drawing;
 using System.IO;
 
-namespace QOI.NET
+namespace QOI.NET.Chunk
 {
-    internal class Run8ChunkWriter : IChunkWriter
+    internal class Run8Writer : IChunkWriter
     {
         private const int MaxRunLength = 32;
 

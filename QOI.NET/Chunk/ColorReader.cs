@@ -1,9 +1,9 @@
 ﻿using System;
 using System.Drawing;
 
-namespace QOI.NET
+namespace QOI.NET.Chunk
 {
-    internal class ColorChunkReader : IChunkReader
+    internal class ColorReader : IChunkReader
     {
         public byte Tag => 0b1111;
         public byte TagBitLength => 4;

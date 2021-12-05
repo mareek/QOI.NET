@@ -1,25 +1,18 @@
 ﻿using System;
-using System.Buffers.Binary;
 using System.Drawing;
 using System.IO;
+using QOI.NET.Chunk;
 
 namespace QOI.NET
 {
     public class QoiDecoder
     {
-        private readonly IChunkReader[] _chunkReaders = { new Run8ChunkReader(), new ColorChunkReader() };
+        private readonly IChunkReader[] _chunkReaders = { new Run8Reader(), new ColorReader() };
 
         public Bitmap Read(Stream stream)
         {
-            Span<byte> header = stackalloc byte[FormatConstants.HeaderLength];
-            stream.Read(header);
+            var (width, height, _, _) = HeaderHelper.ReadHeader(stream);
 
-            if (!header[0..4].SequenceEqual(FormatConstants.MagicBytes))
-                throw new FormatException("This is not a valid QOI image");
-
-            var width = BinaryPrimitives.ReadUInt32BigEndian(header[4..8]);
-            var height = BinaryPrimitives.ReadUInt32BigEndian(header[8..12]);
-            var hasAlphaChannel = header[12] == 4;
             Color[] pixels = DecodePixels(stream, width, height);
 
             return CreateBitmap(width, height, pixels);
@@ -57,6 +50,7 @@ namespace QOI.NET
                     return chunkReader;
                 }
             }
+
             throw new NotImplementedException();
         }
 

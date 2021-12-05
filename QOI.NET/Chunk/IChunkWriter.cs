@@ -1,10 +1,7 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Drawing;
+﻿using System.Drawing;
 using System.IO;
-using System.Text;
 
-namespace QOI.NET
+namespace QOI.NET.Chunk
 {
     internal interface IChunkWriter
     {
