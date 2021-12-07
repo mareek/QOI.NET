@@ -11,7 +11,7 @@ namespace QOI.NET.Chunk
 
         public void WritePixels(Color[] pixels, ref int currentPixel, Span<byte> chunk)
         {
-            pixels[currentPixel++] = Color.FromArgb(chunk[4], chunk[1], chunk[2], chunk[3]);
+            pixels[currentPixel] = Color.FromArgb(chunk[4], chunk[1], chunk[2], chunk[3]);
         }
     }
 }

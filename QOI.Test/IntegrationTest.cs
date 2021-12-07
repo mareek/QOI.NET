@@ -33,11 +33,15 @@ public class IntegrationTest
     public void TestCompressedSize()
     {
         const int HeaderLength = 14;
+        const int colorChunkLength = 5;
+        const int run8ChunkLength = 1;
+        const int indexChunkLength = 1;
+
         QoiEncoder encoder = new();
-        Check.That(encoder.Write(GetBlankImage())).HasSize(HeaderLength + 5 + 1 + 1);
-        Check.That(encoder.Write(GetRandomArgbImage())).HasSize(HeaderLength + 5 * 8 * 6);
-        Check.That(encoder.Write(GetRandomStripedImage())).HasSize(HeaderLength + (5 + 1) * 6);
-        //Check.That(encoder.Write(GetMonochromeStripedImage())).HasSize(FromatConstants.HeaderLength + 5 + 1 + 6);
+        Check.That(encoder.Write(GetBlankImage())).HasSize(HeaderLength + colorChunkLength + run8ChunkLength * 2);
+        Check.That(encoder.Write(GetRandomArgbImage())).HasSize(HeaderLength + colorChunkLength * 8 * 6);
+        Check.That(encoder.Write(GetRandomStripedImage())).HasSize(HeaderLength + (colorChunkLength + run8ChunkLength) * 6);
+        Check.That(encoder.Write(GetMonochromeStripedImage())).HasSize(HeaderLength + colorChunkLength * 2 + indexChunkLength * 4 + 6 * run8ChunkLength);
     }
 
     public static IEnumerable<object[]> GetImgTest()

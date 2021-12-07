@@ -7,7 +7,9 @@ namespace QOI.NET
 {
     public class QoiDecoder
     {
-        private readonly IChunkReader[] _chunkReaders = { new Run8Reader(), new ColorReader() };
+        private readonly Run8Reader _run8Reader = new();
+        private readonly ColorReader _colorReader = new();
+        private readonly IndexReader _indexReader = new();
 
         public Bitmap Read(Stream stream)
         {
@@ -33,6 +35,8 @@ namespace QOI.NET
                 }
 
                 chunkReader.WritePixels(pixels, ref currentPixel, chunkBuffer[0..chunkReader.Length]);
+                _indexReader.AddToIndex(pixels[currentPixel]);
+                currentPixel += 1;
             }
 
             return pixels;
@@ -43,13 +47,12 @@ namespace QOI.NET
             static bool CanReadChunk(IChunkReader chunkReader, byte tagByte)
                 => (tagByte >> (8 - chunkReader.TagBitLength)) == chunkReader.Tag;
 
-            foreach (var chunkReader in _chunkReaders)
-            {
-                if (CanReadChunk(chunkReader, tagByte))
-                {
-                    return chunkReader;
-                }
-            }
+            if (CanReadChunk(_run8Reader, tagByte))
+                return _run8Reader;
+            if (CanReadChunk(_indexReader, tagByte))
+                return _indexReader;
+            if (CanReadChunk(_colorReader, tagByte))
+                return _colorReader;
 
             throw new NotImplementedException();
         }

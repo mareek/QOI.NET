@@ -22,7 +22,7 @@ namespace QOI.NET.Chunk
                 run[i] = color;
             }
 
-            currentPixel += runLength;
+            currentPixel += runLength-1;
         }
     }
 }

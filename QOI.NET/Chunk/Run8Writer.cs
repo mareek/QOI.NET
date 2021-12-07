@@ -24,7 +24,7 @@ namespace QOI.NET.Chunk
             // 5-bit run-length repeating the previous pixel: 1..32
             stream.WriteByte((byte)(0b0100_0000 | (runLength - 1)));
 
-            currentPixel += runLength;
+            currentPixel += runLength - 1;
         }
     }
 }

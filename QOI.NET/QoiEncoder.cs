@@ -1,5 +1,4 @@
 ﻿using System;
-using System.Buffers.Binary;
 using System.Drawing;
 using System.IO;
 using System.Linq;
@@ -9,21 +8,18 @@ namespace QOI.NET
 {
     public class QoiEncoder
     {
-        private readonly IChunkWriter[] _chunkWriters = { new Run8Writer(), new ColorWriter() };
+        private readonly Run8Writer _run8Writer = new();
+        private readonly ColorWriter _colorWriter = new();
+        private readonly IndexWriter _indexWriter = new();
 
         public byte[] Write(Bitmap image)
         {
             using var stream = new MemoryStream();
 
-            WriteHeader(image, stream);
+            HeaderHelper.WriteHeader(stream, (uint)image.Width, (uint)image.Height);
             EncodePixels(image.GetPixels().ToArray(), stream);
 
             return stream.ToArray();
-        }
-
-        private static void WriteHeader(Bitmap image, MemoryStream stream)
-        {
-            HeaderHelper.WriteHeader(stream, (uint)image.Width, (uint)image.Height);
         }
 
         private void EncodePixels(Color[] pixels, Stream stream)
@@ -33,18 +29,19 @@ namespace QOI.NET
             {
                 var chunkWriter = ChunkWriterSelector(pixels, currentPixel);
                 chunkWriter.WriteChunk(pixels, ref currentPixel, stream);
+                _indexWriter.AddToIndex(pixels[currentPixel]);
+                currentPixel += 1;
             }
         }
 
         private IChunkWriter ChunkWriterSelector(Color[] pixels, int currentPixel)
         {
-            foreach (var chunkWriter in _chunkWriters)
-            {
-                if (chunkWriter.CanHandlePixel(pixels, currentPixel))
-                {
-                    return chunkWriter;
-                }
-            }
+            if (_run8Writer.CanHandlePixel(pixels, currentPixel))
+                return _run8Writer;
+            if (_indexWriter.CanHandlePixel(pixels, currentPixel))
+                return _indexWriter;
+            if (_colorWriter.CanHandlePixel(pixels, currentPixel))
+                return _colorWriter;
 
             throw new NotImplementedException();
         }

@@ -10,7 +10,7 @@ namespace QOI.NET.Chunk
 
         public void WriteChunk(Color[] pixels, ref int currentPixel, Stream stream)
         {
-            var pixel = pixels[currentPixel++];
+            var pixel = pixels[currentPixel];
 
             Span<byte> buffer = stackalloc byte[5];
 
