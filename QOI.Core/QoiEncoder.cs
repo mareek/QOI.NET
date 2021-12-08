@@ -1,28 +1,22 @@
 ﻿using System;
-using System.Drawing;
 using System.IO;
-using System.Linq;
-using QOI.NET.Chunk;
+using QOI.Core.Chunk;
 
-namespace QOI.NET
+namespace QOI.Core
 {
     public class QoiEncoder
     {
-        private readonly Run8Writer _run8Writer = new();
+        private readonly RunWriter _run8Writer = new();
         private readonly ColorWriter _colorWriter = new();
         private readonly IndexWriter _indexWriter = new();
 
-        public byte[] Write(Bitmap image)
+        public void Write(QoiImage image, Stream stream)
         {
-            using var stream = new MemoryStream();
-
-            HeaderHelper.WriteHeader(stream, (uint)image.Width, (uint)image.Height);
-            EncodePixels(image.GetPixels().ToArray(), stream);
-
-            return stream.ToArray();
+            HeaderHelper.WriteHeader(stream, image.Width, image.Height, image.HasAlpha, image.ColorSpace);
+            EncodePixels(image.Pixels, stream);
         }
 
-        private void EncodePixels(Color[] pixels, Stream stream)
+        private void EncodePixels(ReadOnlySpan<QoiColor> pixels, Stream stream)
         {
             var currentPixel = 0;
             while (currentPixel < pixels.Length)
@@ -34,7 +28,7 @@ namespace QOI.NET
             }
         }
 
-        private IChunkWriter ChunkWriterSelector(Color[] pixels, int currentPixel)
+        private IChunkWriter ChunkWriterSelector(ReadOnlySpan<QoiColor> pixels, int currentPixel)
         {
             if (_run8Writer.CanHandlePixel(pixels, currentPixel))
                 return _run8Writer;

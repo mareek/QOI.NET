@@ -1,16 +1,16 @@
-﻿using System.Drawing;
+﻿using System;
 using System.IO;
 
-namespace QOI.NET.Chunk
+namespace QOI.Core.Chunk
 {
-    internal class Run8Writer : IChunkWriter
+    internal class RunWriter : IChunkWriter
     {
         private const int MaxRunLength = 32;
 
-        public bool CanHandlePixel(Color[] pixels, int currentPixel)
+        public bool CanHandlePixel(ReadOnlySpan<QoiColor> pixels, int currentPixel)
             => currentPixel > 0 && pixels[currentPixel - 1] == pixels[currentPixel];
 
-        public void WriteChunk(Color[] pixels, ref int currentPixel, Stream stream)
+        public void WriteChunk(ReadOnlySpan<QoiColor> pixels, ref int currentPixel, Stream stream)
         {
             var previousPixel = pixels[currentPixel - 1];
             int runLength = 0;

@@ -11,11 +11,11 @@ public class IntegrationTest
     [MemberData(nameof(GetImgTest))]
     public void FullCircleProcessTest(Bitmap imgTest)
     {
-        QoiEncoder encoder = new();
+        QoiBitmapEncoder encoder = new();
         var imgBytes = encoder.Write(imgTest);
 
         using MemoryStream decodeStream = new(imgBytes);
-        QoiDecoder decoder = new();
+        QoiBitmapDecoder decoder = new();
         var decodedImage = decoder.Read(decodeStream);
 
         for (int y = 0; y < imgTest.Height; y++)
@@ -37,8 +37,8 @@ public class IntegrationTest
         const int run8ChunkLength = 1;
         const int indexChunkLength = 1;
 
-        QoiEncoder encoder = new();
-        Check.That(encoder.Write(GetBlankImage())).HasSize(HeaderLength + colorChunkLength + run8ChunkLength * 2);
+        QoiBitmapEncoder encoder = new();
+        Check.That(encoder.Write(GetBlankImage())).HasSize(HeaderLength + indexChunkLength + run8ChunkLength * 2);
         Check.That(encoder.Write(GetRandomArgbImage())).HasSize(HeaderLength + colorChunkLength * 8 * 6);
         Check.That(encoder.Write(GetRandomStripedImage())).HasSize(HeaderLength + (colorChunkLength + run8ChunkLength) * 6);
         Check.That(encoder.Write(GetMonochromeStripedImage())).HasSize(HeaderLength + colorChunkLength * 2 + indexChunkLength * 4 + 6 * run8ChunkLength);

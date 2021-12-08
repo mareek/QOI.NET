@@ -6,12 +6,4 @@
 	<LangVersion>10</LangVersion>
   </PropertyGroup>
 
-  <ItemGroup>
-    <PackageReference Include="System.Drawing.Common" Version="6.0.0" />
-  </ItemGroup>
-
-  <ItemGroup>
-    <ProjectReference Include="..\QOI.Core\QOI.Core.csproj" />
-  </ItemGroup>
-
 </Project>

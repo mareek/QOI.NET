@@ -1,14 +1,13 @@
 ﻿using System;
-using System.Drawing;
 using System.IO;
 
-namespace QOI.NET.Chunk
+namespace QOI.Core.Chunk
 {
     internal class ColorWriter : IChunkWriter
     {
-        public bool CanHandlePixel(Color[] pixels, int currentPixel) => true;
+        public bool CanHandlePixel(ReadOnlySpan<QoiColor> pixels, int currentPixel) => true;
 
-        public void WriteChunk(Color[] pixels, ref int currentPixel, Stream stream)
+        public void WriteChunk(ReadOnlySpan<QoiColor> pixels, ref int currentPixel, Stream stream)
         {
             var pixel = pixels[currentPixel];
 

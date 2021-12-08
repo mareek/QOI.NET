@@ -2,7 +2,7 @@
 using System.Buffers.Binary;
 using System.IO;
 
-namespace QOI.NET
+namespace QOI.Core
 {
     internal static class HeaderHelper
     {
@@ -22,14 +22,14 @@ namespace QOI.NET
         public static readonly byte[] MagicBytes = { 0x71, 0x6F, 0x69, 0x66 };
         public const int HeaderLength = 14;
 
-        public static void WriteHeader(Stream stream, uint width, uint height, bool hasAlpha = true, byte colorSpaces = 0b1111)
+        public static void WriteHeader(Stream stream, uint width, uint height, bool hasAlpha, byte colorspace)
         {
             Span<byte> header = stackalloc byte[HeaderLength];
             MagicBytes.CopyTo(header[0..4]);
             BinaryPrimitives.WriteUInt32BigEndian(header[4..8], width);
             BinaryPrimitives.WriteUInt32BigEndian(header[8..12], height);
             header[12] = (byte)(hasAlpha ? 4 : 3);
-            header[13] = (byte)(0b0000_1111 & colorSpaces);
+            header[13] = (byte)(0b0000_1111 & colorspace);
             stream.Write(header);
         }
 
