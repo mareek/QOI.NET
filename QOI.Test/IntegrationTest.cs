@@ -8,7 +8,7 @@ namespace QOI.Test;
 public class IntegrationTest
 {
     [Theory]
-    [MemberData(nameof(GetImgTest))]
+    [MemberData(nameof(GetImageTestSet))]
     public void FullCircleProcessTest(Bitmap imgTest)
     {
         QoiBitmapEncoder encoder = new();
@@ -29,22 +29,7 @@ public class IntegrationTest
         }
     }
 
-    [Fact]
-    public void TestCompressedSize()
-    {
-        const int HeaderLength = 14;
-        const int colorChunkLength = 5;
-        const int run8ChunkLength = 1;
-        const int indexChunkLength = 1;
-
-        QoiBitmapEncoder encoder = new();
-        Check.That(encoder.Write(GetBlankImage())).HasSize(HeaderLength + indexChunkLength + run8ChunkLength * 2);
-        Check.That(encoder.Write(GetRandomArgbImage())).HasSize(HeaderLength + colorChunkLength * 8 * 6);
-        Check.That(encoder.Write(GetRandomStripedImage())).HasSize(HeaderLength + (colorChunkLength + run8ChunkLength) * 6);
-        Check.That(encoder.Write(GetMonochromeStripedImage())).HasSize(HeaderLength + colorChunkLength * 2 + indexChunkLength * 4 + 6 * run8ChunkLength);
-    }
-
-    public static IEnumerable<object[]> GetImgTest()
+    public static IEnumerable<object[]> GetImageTestSet()
     {
         yield return new object[] { GetBlankImage() };
         yield return new object[] { GetRandomArgbImage() };
@@ -53,11 +38,36 @@ public class IntegrationTest
         yield return new object[] { GetRandomSimpleImage() };
     }
 
-    private static Bitmap GetBlankImage() => new(8, 6);
-
-    private static Bitmap GetRandomArgbImage()
+    [Theory]
+    [MemberData(nameof(GetSizeTestSet))]
+    public void TestCompressedSize(Bitmap image, int compressedSize)
     {
-        Bitmap image = new(8, 6);
+        QoiBitmapEncoder encoder = new();
+        Check.That(encoder.Write(image)).HasSize(compressedSize);
+    }
+
+    public static IEnumerable<object[]> GetSizeTestSet()
+    {
+        const int HeaderLength = 14;
+        const int colorChunkLength = 5;
+        const int run8ChunkLength = 1;
+        const int run16ChunkLength = 2;
+        const int indexChunkLength = 1;
+
+        yield return new object[] { GetBlankImage(80, 60), HeaderLength + colorChunkLength + run16ChunkLength };
+        yield return new object[] { GetRandomArgbImage(), HeaderLength + colorChunkLength * 8 * 6 };
+        yield return new object[] { GetRandomStripedImage(), HeaderLength + (colorChunkLength + run8ChunkLength) * 6 };
+        yield return new object[] { GetMonochromeStripedImage(), HeaderLength
+                                                                 + colorChunkLength * 2
+                                                                 + indexChunkLength * 4
+                                                                 + run8ChunkLength * 6 };
+    }
+
+    private static Bitmap GetBlankImage(int width = 8, int height = 6) => new(width, height);
+
+    private static Bitmap GetRandomArgbImage(int width = 8, int height = 6)
+    {
+        Bitmap image = new(width, height);
         for (int y = 0; y < image.Height; y++)
         {
             for (int x = 0; x < image.Width; x++)
@@ -69,10 +79,10 @@ public class IntegrationTest
         return image;
     }
 
-    private static Bitmap GetMonochromeStripedImage()
+    private static Bitmap GetMonochromeStripedImage(int width = 8, int height = 6)
     {
         Color[] colors = { Color.Bisque, Color.Chartreuse };
-        Bitmap image = new(8, 6);
+        Bitmap image = new(width, height);
         for (int y = 0; y < image.Height; y++)
         {
             var color = colors[y % 2];
@@ -84,9 +94,9 @@ public class IntegrationTest
         return image;
     }
 
-    private static Bitmap GetRandomStripedImage()
+    private static Bitmap GetRandomStripedImage(int width = 8, int height = 6)
     {
-        Bitmap image = new(8, 6);
+        Bitmap image = new(width, height);
         for (int y = 0; y < image.Height; y++)
         {
             Color color = GetRandomColor();
@@ -98,11 +108,11 @@ public class IntegrationTest
         return image;
     }
 
-    private static Bitmap GetRandomSimpleImage()
+    private static Bitmap GetRandomSimpleImage(int width = 8, int height = 6)
     {
         Color[] colors = Enumerable.Range(0, 16).Select(_ => GetRandomColor()).ToArray();
 
-        Bitmap image = new(8, 6);
+        Bitmap image = new(width, height);
         for (int y = 0; y < image.Height; y++)
         {
             for (int x = 0; x < image.Width; x++)

@@ -9,7 +9,8 @@ internal class IndexWriter : IChunkWriter
 
     public void AddToIndex(QoiColor pixel) => _pixelIndex.Add(pixel);
 
-    public bool CanHandlePixel(ReadOnlySpan<QoiColor> pixels, int currentPixel) => _pixelIndex.Exists(pixels[currentPixel]);
+    public bool CanHandlePixel(ReadOnlySpan<QoiColor> pixels, int currentPixel)
+        => currentPixel > 0 && _pixelIndex.Exists(pixels[currentPixel]);
 
     public void WriteChunk(ReadOnlySpan<QoiColor> pixels, ref int currentPixel, Stream stream)
     {
