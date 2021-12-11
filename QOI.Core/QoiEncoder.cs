@@ -18,25 +18,36 @@ public class QoiEncoder
 
     private void EncodePixels(ReadOnlySpan<QoiColor> pixels, Stream stream)
     {
-        var currentPixel = 0;
-        while (currentPixel < pixels.Length)
+        if (pixels.Length == 0)
+            return;
+
+        //First pixel is always a color chunk
+        QoiColor currentPixel = pixels[0];
+        _colorWriter.WriteChunk(currentPixel, stream);
+
+        int currentPixelIndex = 1;
+        while (currentPixelIndex < pixels.Length)
         {
-            var chunkWriter = ChunkWriterSelector(pixels, currentPixel);
-            chunkWriter.WriteChunk(pixels, ref currentPixel, stream);
-            _indexWriter.AddToIndex(pixels[currentPixel]);
-            currentPixel += 1;
+            QoiColor previousPixel = currentPixel;
+            currentPixel = pixels[currentPixelIndex];
+
+            if (_run8Writer.CanHandlePixel(currentPixel, previousPixel))
+            {
+                _run8Writer.WriteChunk(pixels, currentPixelIndex, previousPixel, stream, out int runlength);
+                currentPixelIndex += runlength;
+            }
+            else if (_indexWriter.CanHandlePixel(currentPixel))
+            {
+                _indexWriter.WriteChunk(currentPixel, stream);
+                currentPixelIndex += 1;
+            }
+            else
+            {
+                _colorWriter.WriteChunk(currentPixel, stream);
+                currentPixelIndex += 1;
+            }
+
+            _indexWriter.AddToIndex(currentPixel);
         }
-    }
-
-    private IChunkWriter ChunkWriterSelector(ReadOnlySpan<QoiColor> pixels, int currentPixel)
-    {
-        if (_run8Writer.CanHandlePixel(pixels, currentPixel))
-            return _run8Writer;
-        if (_indexWriter.CanHandlePixel(pixels, currentPixel))
-            return _indexWriter;
-        if (_colorWriter.CanHandlePixel(pixels, currentPixel))
-            return _colorWriter;
-
-        throw new NotImplementedException();
     }
 }

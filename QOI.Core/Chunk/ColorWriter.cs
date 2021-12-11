@@ -3,14 +3,10 @@ using System.IO;
 
 namespace QOI.Core.Chunk;
 
-internal class ColorWriter : IChunkWriter
+internal class ColorWriter
 {
-    public bool CanHandlePixel(ReadOnlySpan<QoiColor> pixels, int currentPixel) => true;
-
-    public void WriteChunk(ReadOnlySpan<QoiColor> pixels, ref int currentPixel, Stream stream)
+    public void WriteChunk(QoiColor pixel, Stream stream)
     {
-        var pixel = pixels[currentPixel];
-
         Span<byte> buffer = stackalloc byte[5];
 
         buffer[0] = 0b1111_1111;

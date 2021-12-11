@@ -4,18 +4,16 @@ using System.IO;
 
 namespace QOI.Core.Chunk;
 
-internal class RunWriter : IChunkWriter
+internal class RunWriter
 {
     private const short MaxRun8Length = 32;
     private const short MaxRun16Length = 8224;
 
-    public bool CanHandlePixel(ReadOnlySpan<QoiColor> pixels, int currentPixel)
-        => currentPixel > 0 && pixels[currentPixel - 1] == pixels[currentPixel];
+    public bool CanHandlePixel(QoiColor currentPixel, QoiColor previousPixel) => currentPixel == previousPixel;
 
-    public void WriteChunk(ReadOnlySpan<QoiColor> pixels, ref int currentPixel, Stream stream)
+    public void WriteChunk(ReadOnlySpan<QoiColor> pixels, int currentPixel, QoiColor previousPixel, Stream stream, out int runLength)
     {
-        var previousPixel = pixels[currentPixel - 1];
-        short runLength = 0;
+        runLength = 0;
         while (runLength < MaxRun16Length
                && (currentPixel + runLength) < pixels.Length
                && pixels[currentPixel + runLength] == previousPixel)
@@ -36,7 +34,5 @@ internal class RunWriter : IChunkWriter
             chunk[0] = (byte)(0b0110_0000 | chunk[0]);
             stream.Write(chunk);
         }
-
-        currentPixel += runLength - 1;
     }
 }

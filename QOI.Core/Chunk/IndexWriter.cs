@@ -1,20 +1,18 @@
-﻿using System;
-using System.IO;
+﻿using System.IO;
 
 namespace QOI.Core.Chunk;
 
-internal class IndexWriter : IChunkWriter
+internal class IndexWriter
 {
     private readonly PixelIndex _pixelIndex = new();
 
     public void AddToIndex(QoiColor pixel) => _pixelIndex.Add(pixel);
 
-    public bool CanHandlePixel(ReadOnlySpan<QoiColor> pixels, int currentPixel)
-        => currentPixel > 0 && _pixelIndex.Exists(pixels[currentPixel]);
+    public bool CanHandlePixel(QoiColor currentPixel) => _pixelIndex.Exists(currentPixel);
 
-    public void WriteChunk(ReadOnlySpan<QoiColor> pixels, ref int currentPixel, Stream stream)
+    public void WriteChunk(QoiColor currentPixel, Stream stream)
     {
-        var index = _pixelIndex.GetIndex(pixels[currentPixel]);
+        var index = _pixelIndex.GetIndex(currentPixel);
         stream.WriteByte((byte)index);
     }
 }
