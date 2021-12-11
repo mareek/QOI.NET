@@ -9,6 +9,7 @@ public class QoiDecoder
     private readonly RunReader _runReader = new();
     private readonly ColorReader _colorReader = new();
     private readonly IndexReader _indexReader = new();
+    private readonly DiffReader _diffReader = new();
 
     public QoiImage Read(Stream stream)
     {
@@ -23,8 +24,8 @@ public class QoiDecoder
     {
         QoiColor[] pixels = new QoiColor[(height * width)];
         Span<byte> chunkBuffer = stackalloc byte[5];
-        var currentPixel = 0;
-        while (currentPixel < pixels.Length)
+        var currentPixelIndex = 0;
+        while (currentPixelIndex < pixels.Length)
         {
             stream.Read(chunkBuffer[0..1]);
             var chunkReader = ChunkReaderSelector(chunkBuffer[0], out int chunkLength);
@@ -33,10 +34,10 @@ public class QoiDecoder
                 stream.Read(chunkBuffer[1..chunkLength]);
             }
 
-            chunkReader.WritePixels(pixels, ref currentPixel, chunkBuffer[0..chunkLength]);
+            chunkReader.WritePixels(pixels, ref currentPixelIndex, chunkBuffer[0..chunkLength]);
 
-            _indexReader.AddToIndex(pixels[currentPixel]);
-            currentPixel += 1;
+            _indexReader.AddToIndex(pixels[currentPixelIndex]);
+            currentPixelIndex += 1;
         }
 
         return pixels;
@@ -48,6 +49,8 @@ public class QoiDecoder
             return _runReader;
         if (_indexReader.CanReadChunk(tagByte, out chunkLength))
             return _indexReader;
+        if (_diffReader.CanReadChunk(tagByte, out chunkLength))
+            return _diffReader;
         if (_colorReader.CanReadChunk(tagByte, out chunkLength))
             return _colorReader;
 

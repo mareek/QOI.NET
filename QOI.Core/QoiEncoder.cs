@@ -7,8 +7,9 @@ namespace QOI.Core;
 public class QoiEncoder
 {
     private readonly RunWriter _run8Writer = new();
-    private readonly ColorWriter _colorWriter = new();
     private readonly IndexWriter _indexWriter = new();
+    private readonly DiffWriter _diffWriter = new();
+    private readonly ColorWriter _colorWriter = new();
 
     public void Write(QoiImage image, Stream stream)
     {
@@ -41,7 +42,7 @@ public class QoiEncoder
                 _indexWriter.WriteChunk(currentPixel, stream);
                 currentPixelIndex += 1;
             }
-            else
+            else if (!_diffWriter.TryWrite(currentPixel, previousPixel, stream))
             {
                 _colorWriter.WriteChunk(currentPixel, stream);
                 currentPixelIndex += 1;
