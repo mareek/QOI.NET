@@ -36,6 +36,7 @@ public class IntegrationTest
         yield return new object[] { GetMonochromeStripedImage() };
         yield return new object[] { GetRandomStripedImage() };
         yield return new object[] { GetRandomSimpleImage() };
+        yield return new object[] { GetShadedImage() };
     }
 
     [Theory]
@@ -53,9 +54,11 @@ public class IntegrationTest
         const int run8ChunkLength = 1;
         const int run16ChunkLength = 2;
         const int indexChunkLength = 1;
+        const int diff8ChunkLength = 1;
 
         yield return new object[] { GetBlankImage(80, 60), HeaderLength + colorChunkLength + run16ChunkLength };
         yield return new object[] { GetRandomArgbImage(), HeaderLength + colorChunkLength * 8 * 6 };
+        yield return new object[] { GetShadedImage(), HeaderLength + colorChunkLength + diff8ChunkLength * (8 * 6 - 1) };
         yield return new object[] { GetRandomStripedImage(), HeaderLength + (colorChunkLength + run8ChunkLength) * 6 };
         yield return new object[] { GetMonochromeStripedImage(), HeaderLength
                                                                  + colorChunkLength * 2
@@ -119,6 +122,21 @@ public class IntegrationTest
             {
                 var color = colors[Random.Shared.Next(0, colors.Length)];
                 image.SetPixel(x, y, color);
+            }
+        }
+        return image;
+    }
+
+    private static Bitmap GetShadedImage(int width = 8, int height = 6)
+    {
+        Bitmap image = new(width, height);
+        Color color = Color.Black;
+        for (int y = 0; y < image.Height; y++)
+        {
+            for (int x = 0; x < image.Width; x++)
+            {
+                image.SetPixel(x, y, color);
+                color = Color.FromArgb(color.A, color.R + 1, color.G + 1, color.B + 1);
             }
         }
         return image;

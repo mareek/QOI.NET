@@ -42,7 +42,12 @@ public class QoiEncoder
                 _indexWriter.WriteChunk(currentPixel, stream);
                 currentPixelIndex += 1;
             }
-            else if (!_diffWriter.TryWrite(currentPixel, previousPixel, stream))
+            else if (_diffWriter.CanHandlePixel(currentPixel, previousPixel, out var diff))
+            {
+                _diffWriter.WriteChunk(diff, stream);
+                currentPixelIndex += 1;
+            }
+            else
             {
                 _colorWriter.WriteChunk(currentPixel, stream);
                 currentPixelIndex += 1;

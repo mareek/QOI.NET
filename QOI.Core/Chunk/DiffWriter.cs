@@ -11,23 +11,22 @@ internal class DiffWriter
     private const short MinDiff8 = -1;
     private const short MaxDiff8 = 2;
 
-    public bool TryWrite(QoiColor currentPixel, QoiColor previousPixel, Stream stream)
+    private static bool IsBetween(short min, short number, short max) => min <= number && number <= max;
+
+    public bool CanHandlePixel(QoiColor currentPixel, QoiColor previousPixel, out QoiColorDiff diff)
     {
-        return false;
+        //static bool IsEncodableDiff(short componentDiff) => IsBetween(MinDiff24, componentDiff, MaxDiff24);
+        static bool IsEncodableDiff(short componentDiff) => IsBetween(MinDiff8, componentDiff, MaxDiff8);
 
-        static bool IsBetween(short min, short number, short max) => min <= number && number <= max;
-        static bool IsEncodableDiff(short componentDiff) => IsBetween(MinDiff24, componentDiff, MaxDiff24);
+        diff = QoiColorDiff.FromPixels(previousPixel, currentPixel);
+        return IsEncodableDiff(diff.Adiff)
+               && IsEncodableDiff(diff.Rdiff)
+               && IsEncodableDiff(diff.Gdiff)
+               && IsEncodableDiff(diff.Bdiff);
+    }
 
-        var diff = QoiColorDiff.FromPixels(previousPixel, currentPixel);
-
-        if (!IsEncodableDiff(diff.Adiff)
-            || !IsEncodableDiff(diff.Rdiff)
-            || !IsEncodableDiff(diff.Gdiff)
-            || !IsEncodableDiff(diff.Bdiff))
-        {
-            return false;
-        }
-
+    public void WriteChunk(QoiColorDiff diff, Stream stream)
+    {
         if (diff.Adiff == 0
             && IsBetween(MinDiff8, diff.Rdiff, MaxDiff8)
             && IsBetween(MinDiff8, diff.Gdiff, MaxDiff8)
@@ -46,11 +45,41 @@ internal class DiffWriter
         {
             WriteDiff24(diff, stream);
         }
-
-        return true;
     }
 
-    private void WriteDiff8(QoiColorDiff diff, Stream stream) { }
-    private void WriteDiff16(QoiColorDiff diff, Stream stream) { }
-    private void WriteDiff24(QoiColorDiff diff, Stream stream) { }
+    private void WriteDiff8(QoiColorDiff diff, Stream stream)
+    {
+        //QOI_DIFF_8 {
+        //    u8 tag  :  2;   // b10
+        //    u8 dr   :  2;   // 2-bit   red channel difference: -1..2
+        //    u8 dg   :  2;   // 2-bit green channel difference: -1..2
+        //    u8 db   :  2;   // 2-bit  blue channel difference: -1..2
+        //}
+        var dr = diff.Rdiff - MinDiff8;
+        var dg = diff.Gdiff - MinDiff8;
+        var db = diff.Bdiff - MinDiff8;
+        var chunk = 0b10 << 6 | dr << 4 | dg << 2 | db;
+        stream.WriteByte((byte)chunk);
+    }
+
+    private void WriteDiff16(QoiColorDiff diff, Stream stream)
+    {
+        //QOI_DIFF_16 {
+        //    u8 tag  :  3;   // b110
+        //    u8 dr   :  5;   // 5-bit   red channel difference: -15..16
+        //    u8 dg   :  4;   // 4-bit green channel difference:  -7.. 8
+        //    u8 db   :  4;   // 4-bit  blue channel difference:  -7.. 8
+        //}
+    }
+
+    private void WriteDiff24(QoiColorDiff diff, Stream stream)
+    {
+        //QOI_DIFF_24 {
+        //    u8 tag  :  4;   // b1110
+        //    u8 dr   :  5;   // 5-bit   red channel difference: -15..16
+        //    u8 dg   :  5;   // 5-bit green channel difference: -15..16
+        //    u8 db   :  5;   // 5-bit  blue channel difference: -15..16
+        //    u8 da   :  5;   // 5-bit alpha channel difference: -15..16
+        //}
+    }
 }
