@@ -12,7 +12,7 @@ internal class IndexWriter
 
     public void WriteChunk(QoiColor currentPixel, Stream stream)
     {
-        var index = _pixelIndex.GetIndex(currentPixel);
-        stream.WriteByte((byte)index);
+        var index = (byte)_pixelIndex.GetIndex(currentPixel);
+        stream.WriteByte(index.WithTag(Tag.Index, 2));
     }
 }

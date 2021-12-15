@@ -24,14 +24,15 @@ internal class RunWriter
         if (runLength <= MaxRun8Length)
         {
             // 5-bit run-length repeating the previous pixel: 1..32
-            stream.WriteByte((byte)(0b0100_0000 | (runLength - 1)));
+            byte value = (byte)(runLength - 1);
+            stream.WriteByte(value.WithTag(Tag.Run8, 3));
         }
         else
         {
             // 13-bit run-length repeating the previous pixel: 33..8224
             Span<byte> chunk = stackalloc byte[2];
             BinaryPrimitives.WriteInt16BigEndian(chunk, (short)(runLength - 33));
-            chunk[0] = (byte)(0b0110_0000 | chunk[0]);
+            chunk.WriteTag(Tag.Run16, 3);
             stream.Write(chunk);
         }
     }

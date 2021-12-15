@@ -4,24 +4,19 @@ namespace QOI.Core.Chunk;
 
 internal class DiffReader : IChunkReader
 {
-    private const byte Diff8Tag = 0b10;
-    private const byte Diff16Tag = 0b110;
-    private const byte Diff24Tag = 0b1110;
-
     public bool CanReadChunk(byte tagByte, out int chunkLength)
     {
-        if ((tagByte >> 6) == Diff8Tag)
+        if (tagByte.HasTag(Tag.Diff8, 2))
         {
             chunkLength = 1;
             return true;
         }
-        else if ((tagByte >> 5) == Diff16Tag)
+        else if (tagByte.HasTag(Tag.Diff16, 3))
         {
             chunkLength = 2;
-            return false;
             return true;
         }
-        else if ((tagByte >> 4) == Diff24Tag)
+        else if (tagByte.HasTag(Tag.Diff24, 4))
         {
             chunkLength = 3;
             return false;
@@ -45,14 +40,23 @@ internal class DiffReader : IChunkReader
         => chunk.Length switch
         {
             1 => ParseDiff8(chunk[0]),
+            2 => ParseDiff16(chunk),
             _ => throw new NotImplementedException()
         };
 
     private QoiColorDiff ParseDiff8(byte chunk)
     {
-        int rDiff = TruncateToBits((chunk >> 4), 2) - 1;
-        int gDiff = TruncateToBits((chunk >> 2), 2) - 1;
-        int bDiff = TruncateToBits(chunk, 2) - 1;
+        int rDiff = TruncateToBits((chunk >> 4), 2) +DiffConst.MinDiff8;
+        int gDiff = TruncateToBits((chunk >> 2), 2) + DiffConst.MinDiff8;
+        int bDiff = TruncateToBits(chunk, 2) + DiffConst.MinDiff8;
+        return new(0, (short)rDiff, (short)gDiff, (short)bDiff);
+    }
+
+    private QoiColorDiff ParseDiff16(Span<byte> chunk)
+    {
+        int rDiff = TruncateToBits(chunk[0], 5) + DiffConst.MinDiff24;
+        int gDiff = TruncateToBits((chunk[1] >> 4), 4) + DiffConst.MinDiff16;
+        int bDiff = TruncateToBits(chunk[1], 4) + DiffConst.MinDiff16;
         return new(0, (short)rDiff, (short)gDiff, (short)bDiff);
     }
 

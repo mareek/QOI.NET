@@ -1,4 +1,5 @@
-﻿using System.IO;
+﻿using System;
+using System.IO;
 
 namespace QOI.Core.Chunk;
 
@@ -16,11 +17,11 @@ internal class DiffWriter
     public bool CanHandlePixel(QoiColor currentPixel, QoiColor previousPixel, out QoiColorDiff diff)
     {
         //static bool IsEncodableDiff(short componentDiff) => IsBetween(MinDiff24, componentDiff, MaxDiff24);
-        static bool IsEncodableDiff(short componentDiff) => IsBetween(MinDiff8, componentDiff, MaxDiff8);
+        static bool IsEncodableDiff(short componentDiff) => IsBetween(MinDiff16, componentDiff, MaxDiff16);
 
         diff = QoiColorDiff.FromPixels(previousPixel, currentPixel);
-        return IsEncodableDiff(diff.Adiff)
-               && IsEncodableDiff(diff.Rdiff)
+        return true //IsEncodableDiff(diff.Adiff)
+               && IsBetween(MinDiff24, diff.Rdiff, MaxDiff24)
                && IsEncodableDiff(diff.Gdiff)
                && IsEncodableDiff(diff.Bdiff);
     }
@@ -35,7 +36,7 @@ internal class DiffWriter
             WriteDiff8(diff, stream);
         }
         else if (diff.Adiff == 0
-            && IsBetween(MinDiff16, diff.Rdiff, MaxDiff16)
+            && IsBetween(MinDiff24, diff.Rdiff, MaxDiff24)
             && IsBetween(MinDiff16, diff.Gdiff, MaxDiff16)
             && IsBetween(MinDiff16, diff.Bdiff, MaxDiff16))
         {
@@ -58,8 +59,8 @@ internal class DiffWriter
         var dr = diff.Rdiff - MinDiff8;
         var dg = diff.Gdiff - MinDiff8;
         var db = diff.Bdiff - MinDiff8;
-        var chunk = 0b10 << 6 | dr << 4 | dg << 2 | db;
-        stream.WriteByte((byte)chunk);
+        var chunk = (byte)(dr << 4 | dg << 2 | db);
+        stream.WriteByte(chunk.WithTag(Tag.Diff8, 2));
     }
 
     private void WriteDiff16(QoiColorDiff diff, Stream stream)
@@ -70,6 +71,15 @@ internal class DiffWriter
         //    u8 dg   :  4;   // 4-bit green channel difference:  -7.. 8
         //    u8 db   :  4;   // 4-bit  blue channel difference:  -7.. 8
         //}
+        var dr = diff.Rdiff - MinDiff24;
+        var dg = diff.Gdiff - MinDiff16;
+        var db = diff.Bdiff - MinDiff16;
+
+        Span<byte> chunk = stackalloc byte[2];
+        chunk[0] = (byte)dr;
+        chunk[1] = (byte)(dg << 4 | db);
+        chunk.WriteTag(Tag.Diff16, 3);
+        stream.Write(chunk);
     }
 
     private void WriteDiff24(QoiColorDiff diff, Stream stream)

@@ -6,13 +6,13 @@ internal class RunReader : IChunkReader
 {
     public bool CanReadChunk(byte tagByte, out int chunkLength)
     {
-        if ((tagByte >> 5) == 0b011)
+        if (tagByte.HasTag(Tag.Run16, 3))
         {
             chunkLength = 2;
             return true;
         }
         chunkLength = 1;
-        return (tagByte >> 5) == 0b010;
+        return tagByte.HasTag(Tag.Run8, 3);
     }
 
     public void WritePixels(QoiColor[] pixels, ref int currentPixel, Span<byte> chunk)
