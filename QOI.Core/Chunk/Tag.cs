@@ -2,32 +2,38 @@
 
 namespace QOI.Core.Chunk;
 
-internal static class Tag
+internal struct Tag
 {
-    public const byte Run8 = 0b010;
-    public const byte Run16 = 0b011;
+    public static readonly Tag Run8 = new(0b010, 3);
+    public static readonly Tag Run16 = new(0b011, 3);
+    public static readonly Tag Index = new(0b00, 2);
+    public static readonly Tag Diff8 = new(0b10, 2);
+    public static readonly Tag Diff16 = new(0b110, 3);
+    public static readonly Tag Diff24 = new(0b1110, 4);
+    public static readonly Tag Color = new(0b1111, 4);
 
-    public const byte Index = 0b00;
+    private readonly byte _tag;
+    private readonly byte _tagLength;
 
-    public const byte Diff8 = 0b10;
-    public const byte Diff16 = 0b110;
-    public const byte Diff24 = 0b1110;
-
-    public const byte Color = 0b1111;
-
-    public static bool HasTag(this byte tagByte, byte tag, byte tagLength)
-        => tag == (tagByte >> (8 - tagLength));
-
-    public static byte WithTag(this byte tagByte, byte tag, byte tagLength)
+    public Tag(byte tag, byte tagLength)
     {
-        int eraserMask = 0b1111_1111 >> tagLength;
-        int tagMask = tag << (8 - tagLength);
+        _tag = tag;
+        _tagLength = tagLength;
+    }
+
+    public bool HasTag(byte tagByte)
+        => _tag == (tagByte >> (8 - _tagLength));
+
+    public byte WithTag(byte tagByte)
+    {
+        int eraserMask = 0b1111_1111 >> _tagLength;
+        int tagMask = _tag << (8 - _tagLength);
         int cleanTagByte = tagByte & eraserMask;
         return (byte)(cleanTagByte | tagMask);
     }
 
-    public static void WriteTag(this Span<byte> chunk, byte tag, byte tagLength)
+    public void WriteTag(Span<byte> chunk)
     {
-        chunk[0] = chunk[0].WithTag(tag, tagLength);
+        chunk[0] = WithTag(chunk[0]);
     }
 }
