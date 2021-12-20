@@ -2,12 +2,12 @@
 
 namespace QOI.Core.Chunk;
 
-internal class ColorReader : IChunkReader
+internal class RgbaReader : IChunkReader
 {
     public bool CanReadChunk(byte tagByte, out int chunkLength)
     {
         chunkLength = 5;
-        return Tag.Color.IsPresent(tagByte);
+        return Tag.RGBA.IsPresent(tagByte);
     }
 
     public void WritePixels(QoiColor[] pixels, ref int currentPixel, Span<byte> chunk)
