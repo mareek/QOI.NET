@@ -9,7 +9,8 @@ public class QoiEncoder
     private readonly RunWriter _runWriter = new();
     private readonly IndexWriter _indexWriter = new();
     private readonly DiffWriter _diffWriter = new();
-    private readonly RgbaWriter _colorWriter = new();
+    private readonly RgbaWriter _rgbaWriter = new();
+    private readonly RgbWriter _rgbWriter = new();
 
     public void Write(QoiImage image, Stream stream)
     {
@@ -24,7 +25,7 @@ public class QoiEncoder
 
         //First pixel is always a color chunk
         QoiColor currentPixel = pixels[0];
-        _colorWriter.WriteChunk(currentPixel, stream);
+        _rgbaWriter.WriteChunk(currentPixel, stream);
 
         int currentPixelIndex = 1;
         while (currentPixelIndex < pixels.Length)
@@ -47,9 +48,14 @@ public class QoiEncoder
                 _diffWriter.WriteChunk(diff, stream);
                 currentPixelIndex += 1;
             }
+            else if (_rgbWriter.CanHandlePixel(currentPixel))
+            {
+                _rgbWriter.WriteChunk(currentPixel, stream);
+                currentPixelIndex += 1;
+            }
             else
             {
-                _colorWriter.WriteChunk(currentPixel, stream);
+                _rgbaWriter.WriteChunk(currentPixel, stream);
                 currentPixelIndex += 1;
             }
 

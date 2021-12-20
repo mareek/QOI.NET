@@ -4,9 +4,11 @@ namespace QOI.Core.Chunk;
 
 internal struct Tag
 {
-    public static readonly Tag RUN = new(0b11, 2);
     public static readonly Tag INDEX = new(0b00, 2);
     public static readonly Tag DIFF = new(0b01, 2);
+    public static readonly Tag LUMA = new(0b10, 2);
+    public static readonly Tag RUN = new(0b11, 2);
+    public static readonly Tag RGB = new(0b1111_1110, 8);
     public static readonly Tag RGBA = new(0b1111_1111, 8);
 
     private readonly byte _tag;

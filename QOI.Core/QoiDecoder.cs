@@ -6,8 +6,9 @@ namespace QOI.Core;
 
 public class QoiDecoder
 {
-    private readonly RunReader _runReader = new();
     private readonly RgbaReader _rgbaReader = new();
+    private readonly RgbReader _rgbReader = new();
+    private readonly RunReader _runReader = new();
     private readonly IndexReader _indexReader = new();
     private readonly DiffReader _diffReader = new();
 
@@ -47,6 +48,8 @@ public class QoiDecoder
     {
         if (_rgbaReader.CanReadChunk(tagByte, out chunkLength))
             return _rgbaReader;
+        if (_rgbReader.CanReadChunk(tagByte, out chunkLength))
+            return _rgbReader;
         if (_runReader.CanReadChunk(tagByte, out chunkLength))
             return _runReader;
         if (_indexReader.CanReadChunk(tagByte, out chunkLength))
