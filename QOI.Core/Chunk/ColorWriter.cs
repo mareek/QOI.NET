@@ -15,7 +15,7 @@ internal class ColorWriter
         buffer[3] = pixel.B;
         buffer[4] = pixel.A;
 
-        Tag.Color.WriteTag(buffer);
+        Tag.Color.Write(buffer);
         stream.Write(buffer);
     }
 }

@@ -6,17 +6,17 @@ internal class DiffReader : IChunkReader
 {
     public bool CanReadChunk(byte tagByte, out int chunkLength)
     {
-        if (Tag.Diff8.HasTag(tagByte))
+        if (Tag.Diff8.IsPresent(tagByte))
         {
             chunkLength = 1;
             return true;
         }
-        else if (Tag.Diff16.HasTag(tagByte))
+        else if (Tag.Diff16.IsPresent(tagByte))
         {
             chunkLength = 2;
             return true;
         }
-        else if (Tag.Diff24.HasTag(tagByte))
+        else if (Tag.Diff24.IsPresent(tagByte))
         {
             chunkLength = 3;
             return false;

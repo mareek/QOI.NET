@@ -21,10 +21,10 @@ internal struct Tag
         _tagLength = tagLength;
     }
 
-    public bool HasTag(byte tagByte)
+    public bool IsPresent(byte tagByte)
         => _tag == (tagByte >> (8 - _tagLength));
 
-    public byte WithTag(byte tagByte)
+    public byte Apply(byte tagByte)
     {
         int eraserMask = 0b1111_1111 >> _tagLength;
         int tagMask = _tag << (8 - _tagLength);
@@ -32,8 +32,8 @@ internal struct Tag
         return (byte)(cleanTagByte | tagMask);
     }
 
-    public void WriteTag(Span<byte> chunk)
+    public void Write(Span<byte> chunk)
     {
-        chunk[0] = WithTag(chunk[0]);
+        chunk[0] = Apply(chunk[0]);
     }
 }

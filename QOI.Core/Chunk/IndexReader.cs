@@ -11,7 +11,7 @@ internal class IndexReader : IChunkReader
     public bool CanReadChunk(byte tagByte, out int chunkLength)
     {
         chunkLength = 1;
-        return Tag.Index.HasTag(tagByte);
+        return Tag.Index.IsPresent(tagByte);
     }
 
     public void WritePixels(QoiColor[] pixels, ref int currentPixel, Span<byte> chunk)

@@ -61,7 +61,7 @@ internal class DiffWriter
         var db = diff.Bdiff - MinDiff8;
         var chunk = (byte)(dr << 4 | dg << 2 | db);
 
-        stream.WriteByte(Tag.Diff8.WithTag(chunk));
+        stream.WriteByte(Tag.Diff8.Apply(chunk));
     }
 
     private void WriteDiff16(QoiColorDiff diff, Stream stream)
@@ -79,7 +79,7 @@ internal class DiffWriter
         Span<byte> chunk = stackalloc byte[2];
         chunk[0] = (byte)dr;
         chunk[1] = (byte)(dg << 4 | db);
-        Tag.Diff16.WriteTag(chunk);
+        Tag.Diff16.Write(chunk);
         stream.Write(chunk);
     }
 

@@ -7,7 +7,7 @@ internal class ColorReader : IChunkReader
     public bool CanReadChunk(byte tagByte, out int chunkLength)
     {
         chunkLength = 5;
-        return Tag.Color.HasTag(tagByte);
+        return Tag.Color.IsPresent(tagByte);
     }
 
     public void WritePixels(QoiColor[] pixels, ref int currentPixel, Span<byte> chunk)
