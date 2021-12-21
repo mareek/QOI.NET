@@ -16,6 +16,7 @@ public class QoiEncoder
     {
         HeaderHelper.WriteHeader(stream, image.Width, image.Height, image.HasAlpha, image.ColorSpace);
         EncodePixels(image.Pixels, stream);
+        WriteFooter(stream);
     }
 
     private void EncodePixels(ReadOnlySpan<QoiColor> pixels, Stream stream)
@@ -26,39 +27,47 @@ public class QoiEncoder
         // The decoder and encoder start with { r: 0, g: 0, b: 0, a: 255} as the previous pixel value
         var previousPixel = QoiColor.FromArgb(255, 0, 0, 0);
 
-        int currentPixelIndex = 0;
-        while (currentPixelIndex < pixels.Length)
+        for (int currentPixelIndex = 0; currentPixelIndex < pixels.Length; currentPixelIndex++)
         {
             QoiColor currentPixel = pixels[currentPixelIndex];
 
             if (_runWriter.CanHandlePixel(currentPixel, previousPixel))
             {
                 _runWriter.WriteChunk(pixels, currentPixelIndex, previousPixel, stream, out int runlength);
-                currentPixelIndex += runlength;
+                currentPixelIndex += runlength - 1;
             }
             else if (_indexWriter.CanHandlePixel(currentPixel))
             {
                 _indexWriter.WriteChunk(currentPixel, stream);
-                currentPixelIndex += 1;
             }
             else if (_diffWriter.CanHandlePixel(currentPixel, previousPixel, out var diff))
             {
                 _diffWriter.WriteChunk(diff, stream);
-                currentPixelIndex += 1;
             }
             else if (_rgbWriter.CanHandlePixel(currentPixel))
             {
                 _rgbWriter.WriteChunk(currentPixel, stream);
-                currentPixelIndex += 1;
             }
             else
             {
                 _rgbaWriter.WriteChunk(currentPixel, stream);
-                currentPixelIndex += 1;
             }
 
             _indexWriter.AddToIndex(currentPixel);
             previousPixel = currentPixel;
         }
+    }
+
+    private static void WriteFooter(Stream stream)
+    {
+        // The byte stream's end is marked with 7 0x00 bytes followed by a single 0x01 byte
+
+        Span<byte> footer = stackalloc byte[8];
+        for (int i = 0; i < 7; i++)
+        {
+            footer[i] = 0;
+        }
+        footer[7] = 1;
+        stream.Write(footer);
     }
 }
