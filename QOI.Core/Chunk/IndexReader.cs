@@ -14,7 +14,7 @@ internal class IndexReader : IChunkReader
         return Tag.INDEX.IsPresent(tagByte);
     }
 
-    public void WritePixels(QoiColor[] pixels, ref int currentPixel, Span<byte> chunk)
+    public void WritePixels(QoiColor[] pixels, ref int currentPixel, ReadOnlySpan<byte> chunk)
     {
         pixels[currentPixel] = _pixelIndex.Get(chunk[0]);
     }

@@ -23,15 +23,13 @@ public class QoiEncoder
         if (pixels.Length == 0)
             return;
 
-        //First pixel is always a color chunk
-        QoiColor currentPixel = pixels[0];
-        _rgbaWriter.WriteChunk(currentPixel, stream);
+        // The decoder and encoder start with { r: 0, g: 0, b: 0, a: 255} as the previous pixel value
+        var previousPixel = QoiColor.FromArgb(255, 0, 0, 0);
 
-        int currentPixelIndex = 1;
+        int currentPixelIndex = 0;
         while (currentPixelIndex < pixels.Length)
         {
-            QoiColor previousPixel = currentPixel;
-            currentPixel = pixels[currentPixelIndex];
+            QoiColor currentPixel = pixels[currentPixelIndex];
 
             if (_runWriter.CanHandlePixel(currentPixel, previousPixel))
             {
@@ -60,6 +58,7 @@ public class QoiEncoder
             }
 
             _indexWriter.AddToIndex(currentPixel);
+            previousPixel = currentPixel;
         }
     }
 }

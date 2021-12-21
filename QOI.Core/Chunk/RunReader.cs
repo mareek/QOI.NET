@@ -10,14 +10,14 @@ internal class RunReader : IChunkReader
         return Tag.RUN.IsPresent(tagByte);
     }
 
-    public void WritePixels(QoiColor[] pixels, ref int currentPixel, Span<byte> chunk)
+    public void WritePixels(QoiColor[] pixels, ref int currentPixel, ReadOnlySpan<byte> chunk)
     {
         int runLength = chunk[0] & 0b0011_1111; // erase tag bits
 
         // 6-bit run-length repeating the previous pixel: 1..62
         runLength += 1;
 
-        var color = pixels[currentPixel - 1];
+        var color = ChunkHelper.GetPreviousPixel(pixels, currentPixel);
         var run = pixels.AsSpan(currentPixel, runLength);
         for (int i = 0; i < run.Length; i++)
         {

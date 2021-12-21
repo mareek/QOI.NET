@@ -10,10 +10,10 @@ internal class DiffReader : IChunkReader
         return Tag.DIFF.IsPresent(tagByte);
     }
 
-    public void WritePixels(QoiColor[] pixels, ref int currentPixel, Span<byte> chunk)
+    public void WritePixels(QoiColor[] pixels, ref int currentPixel, ReadOnlySpan<byte> chunk)
     {
         var diff = ParseDiff(chunk[0]);
-        var previousPixel = pixels[currentPixel - 1];
+        var previousPixel = ChunkHelper.GetPreviousPixel(pixels, currentPixel);
         pixels[currentPixel] = diff.GetPixel(previousPixel);
     }
 
@@ -24,9 +24,9 @@ internal class DiffReader : IChunkReader
         // 2-bit green channel difference from the previous pixel -2..1
         // 2-bit blue channel difference from the previous pixel -2..1
 
-        int rDiff = TruncateToBits((chunk >> 4), 2) + DiffConst.MinDiff;
-        int gDiff = TruncateToBits((chunk >> 2), 2) + DiffConst.MinDiff;
-        int bDiff = TruncateToBits(chunk, 2) + DiffConst.MinDiff;
+        int rDiff = TruncateToBits((chunk >> 4), 2) + ChunkHelper.MinDiff;
+        int gDiff = TruncateToBits((chunk >> 2), 2) + ChunkHelper.MinDiff;
+        int bDiff = TruncateToBits(chunk, 2) + ChunkHelper.MinDiff;
         return new(0, (short)rDiff, (short)gDiff, (short)bDiff);
     }
 
