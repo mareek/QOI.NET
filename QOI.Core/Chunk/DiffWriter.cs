@@ -10,7 +10,7 @@ internal class DiffWriter
         static bool IsEncodableDiff(short componentDiff) => IsBetween(ChunkHelper.MinDiff, componentDiff, ChunkHelper.MaxDiff);
 
         diff = QoiColorDiff.FromPixels(previousPixel, currentPixel);
-        return diff.Adiff == 0
+        return currentPixel.A == previousPixel.A
                && IsEncodableDiff(diff.Gdiff)
                && IsEncodableDiff(diff.Gdiff)
                && IsEncodableDiff(diff.Bdiff);

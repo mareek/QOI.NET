@@ -5,7 +5,7 @@ namespace QOI.Core.Chunk;
 
 internal class RgbWriter
 {
-    public bool CanHandlePixel(QoiColor currentPixel) => currentPixel.A == 255;
+    public bool CanHandlePixel(QoiColor currentPixel, QoiColor previousPixel) => currentPixel.A == previousPixel.A;
 
     public void WriteChunk(QoiColor pixel, Stream stream)
     {

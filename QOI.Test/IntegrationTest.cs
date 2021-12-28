@@ -8,6 +8,28 @@ namespace QOI.Test;
 public class IntegrationTest
 {
     [Theory]
+    [InlineData("testcard.png", "testcard.qoi")]
+    [InlineData("testcard_rgba.png", "testcard_rgba.qoi")]
+    [InlineData("dice.png", "dice.qoi")]
+    public void StandardImagesTest(string referenceFileName, string qoiFileName)
+    {
+        var referenceImage = new Bitmap(Path.Combine("TestImages", referenceFileName));
+
+        QoiBitmapDecoder decoder = new();
+        var qoiImage = decoder.Read(Path.Combine("TestImages", qoiFileName));
+
+        for (int y = 0; y < referenceImage.Height; y++)
+        {
+            for (int x = 0; x < referenceImage.Width; x++)
+            {
+                var pixelReference = referenceImage.GetPixel(x, y);
+                var pixelQoi = qoiImage.GetPixel(x, y);
+                Check.That(pixelQoi).IsEqualTo(pixelReference);
+            }
+        }
+    }
+
+    [Theory]
     [MemberData(nameof(GetImageTestSet))]
     public void FullCircleProcessTest(Bitmap imgTest)
     {

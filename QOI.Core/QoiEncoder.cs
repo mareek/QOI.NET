@@ -44,7 +44,7 @@ public class QoiEncoder
             {
                 _diffWriter.WriteChunk(diff, stream);
             }
-            else if (_rgbWriter.CanHandlePixel(currentPixel))
+            else if (_rgbWriter.CanHandlePixel(currentPixel, previousPixel))
             {
                 _rgbWriter.WriteChunk(currentPixel, stream);
             }

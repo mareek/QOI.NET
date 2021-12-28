@@ -23,11 +23,16 @@ internal struct Tag
     public bool IsPresent(byte tagByte)
         => _tag == (tagByte >> (8 - _tagLength));
 
-    public byte Apply(byte tagByte)
+    public byte Erase(byte tagByte)
     {
         int eraserMask = 0b1111_1111 >> _tagLength;
+        return (byte)(tagByte & eraserMask);
+    }
+
+    public byte Apply(byte tagByte)
+    {
+        int cleanTagByte = Erase(tagByte);
         int tagMask = _tag << (8 - _tagLength);
-        int cleanTagByte = tagByte & eraserMask;
         return (byte)(cleanTagByte | tagMask);
     }
 

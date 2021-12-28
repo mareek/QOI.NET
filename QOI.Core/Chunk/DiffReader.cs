@@ -27,7 +27,7 @@ internal class DiffReader : IChunkReader
         int rDiff = TruncateToBits((chunk >> 4), 2) + ChunkHelper.MinDiff;
         int gDiff = TruncateToBits((chunk >> 2), 2) + ChunkHelper.MinDiff;
         int bDiff = TruncateToBits(chunk, 2) + ChunkHelper.MinDiff;
-        return new(0, (short)rDiff, (short)gDiff, (short)bDiff);
+        return new((short)rDiff, (short)gDiff, (short)bDiff);
     }
 
     private static int TruncateToBits(int number, byte bitCount)

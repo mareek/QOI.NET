@@ -12,6 +12,7 @@ internal class RgbReader : IChunkReader
 
     public void WritePixels(QoiColor[] pixels, ref int currentPixel, ReadOnlySpan<byte> chunk)
     {
-        pixels[currentPixel] = QoiColor.FromRgb(chunk[1], chunk[2], chunk[3]);
+        var previousPixel = ChunkHelper.GetPreviousPixel(pixels, currentPixel);
+        pixels[currentPixel] = QoiColor.FromArgb(previousPixel.A, chunk[1], chunk[2], chunk[3]);
     }
 }

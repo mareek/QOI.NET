@@ -11,6 +11,7 @@ public class QoiDecoder
     private readonly RunReader _runReader = new();
     private readonly IndexReader _indexReader = new();
     private readonly DiffReader _diffReader = new();
+    private readonly LumaReader _lumaReader = new();
 
     public QoiImage Read(Stream stream)
     {
@@ -56,7 +57,9 @@ public class QoiDecoder
             return _indexReader;
         if (_diffReader.CanReadChunk(tagByte, out chunkLength))
             return _diffReader;
-
-        throw new NotImplementedException();
+        if (_lumaReader.CanReadChunk(tagByte, out chunkLength))
+            return _lumaReader;
+        
+        throw new FormatException($"Unknown tag : {tagByte:X4}");
     }
 }

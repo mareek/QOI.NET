@@ -18,18 +18,6 @@ namespace QOI.NET
             }
         }
 
-        public static void SetPixels(this Bitmap image, Color[] pixels)
-        {
-            for (int y = 0; y < image.Height; y++)
-            {
-                int offset = y * image.Width;
-                for (int x = 0; x < image.Width; x++)
-                {
-                    image.SetPixel(x, y, pixels[x + offset]);
-                }
-            }
-        }
-
         public static QoiColor ToQoiColor(this Color color)
             => QoiColor.FromArgb(color.A, color.R, color.G, color.B);
 
@@ -43,10 +31,17 @@ namespace QOI.NET
         }
         public static Bitmap ToBitmap(this QoiImage qoiImage)
         {
-            var result = new Bitmap((int)qoiImage.Width, (int)qoiImage.Height);
-            Color[] pixels = qoiImage.Pixels.ToArray().Select(c => c.ToColor()).ToArray();
-            result.SetPixels(pixels);
-            return result;
+            var image = new Bitmap((int)qoiImage.Width, (int)qoiImage.Height);
+            for (int y = 0; y < image.Height; y++)
+            {
+                int offset = y * image.Width;
+                for (int x = 0; x < image.Width; x++)
+                {
+                    image.SetPixel(x, y, qoiImage.Pixels[x + offset].ToColor());
+                }
+            }
+
+            return image;
         }
     }
 }

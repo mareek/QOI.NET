@@ -14,6 +14,7 @@ using System.Windows.Media;
 using System.Windows.Media.Imaging;
 using System.Windows.Navigation;
 using System.Windows.Shapes;
+using Microsoft.Win32;
 
 namespace QOI.NET
 {
@@ -34,7 +35,25 @@ namespace QOI.NET
 
         private void Button_Click(object sender, RoutedEventArgs e)
         {
-            using var image = new Bitmap(txtPath.Text);
+            OpenFileDialog openFileDialog = new();
+            if (openFileDialog.ShowDialog() ?? false)
+            {
+                txtPath.Text = openFileDialog.FileName;
+                LoadImage(txtPath.Text);
+            }
+        }
+
+        private void LoadImage(string filePath)
+        {
+            Bitmap image;
+            try
+            {
+                image = new QoiBitmapDecoder().Read(filePath);
+            }
+            catch (FormatException)
+            {
+                image = new Bitmap(filePath);
+            }
             ImageViewer.Source = image.ToImageSource();
         }
     }
