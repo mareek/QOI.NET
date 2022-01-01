@@ -6,13 +6,9 @@
         xmlns:local="clr-namespace:QOI.NET"
         mc:Ignorable="d"
         Title="MainWindow" Height="450" Width="800"
-        WindowStartupLocation="CenterScreen"
-        Loaded="Window_Loaded">
+        WindowStartupLocation="CenterScreen">
     <DockPanel>
-        <DockPanel DockPanel.Dock="Bottom">
-            <Button DockPanel.Dock="Right" Click="Button_Click">Load</Button>
-            <TextBox Name="txtPath"/>
-        </DockPanel>
+        <Button DockPanel.Dock="Bottom" Click="Button_Click" Margin="3px" Padding="3px">Load</Button>
         <Image Name="ImageViewer"/>
     </DockPanel>
 </Window>

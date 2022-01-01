@@ -15,6 +15,7 @@ using System.Windows.Media.Imaging;
 using System.Windows.Navigation;
 using System.Windows.Shapes;
 using Microsoft.Win32;
+using QOI.Core;
 
 namespace QOI.NET
 {
@@ -28,33 +29,26 @@ namespace QOI.NET
             InitializeComponent();
         }
 
-        private void Window_Loaded(object sender, RoutedEventArgs e)
-        {
-            txtPath.Text = @"C:\Users\maree\Downloads\moulin.png";
-        }
-
         private void Button_Click(object sender, RoutedEventArgs e)
         {
             OpenFileDialog openFileDialog = new();
             if (openFileDialog.ShowDialog() ?? false)
             {
-                txtPath.Text = openFileDialog.FileName;
-                LoadImage(txtPath.Text);
+                LoadImage(openFileDialog.FileName);
             }
         }
 
         private void LoadImage(string filePath)
         {
-            Bitmap image;
             try
             {
-                image = new QoiBitmapDecoder().Read(filePath);
+                using var fileStream = File.OpenRead(filePath);
+                ImageViewer.Source = new QoiDecoder().Read(fileStream).ToImageSource();
             }
             catch (FormatException)
             {
-                image = new Bitmap(filePath);
+                ImageViewer.Source = new Bitmap(filePath).ToImageSource();
             }
-            ImageViewer.Source = image.ToImageSource();
         }
     }
 }

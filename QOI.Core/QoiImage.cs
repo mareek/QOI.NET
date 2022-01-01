@@ -28,4 +28,22 @@ public class QoiImage
     public byte ColorSpace { get; }
 
     public ReadOnlySpan<QoiColor> Pixels => _pixels;
+
+    public byte[] GetBGRAPixels()
+    {
+        const int pixelSize = 4;
+        var result = new byte[_pixels.Length * pixelSize];
+        for (int i = 0; i < _pixels.Length; i++)
+        {
+            var pixel = _pixels[i];
+            int offset = i * pixelSize;
+            var buffer = result.AsSpan(offset, pixelSize);
+            buffer[0] = pixel.B;
+            buffer[1] = pixel.G;
+            buffer[2] = pixel.R;
+            buffer[3] = pixel.A;
+
+        }
+        return result;
+    }
 }
