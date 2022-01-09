@@ -27,6 +27,11 @@ namespace QOI.NET
         public MainWindow()
         {
             InitializeComponent();
+            var args = Environment.GetCommandLineArgs();
+            if (args.Length > 1 && File.Exists(args[1]))
+            {
+                LoadImage(args[1]);
+            }
         }
 
         private void Button_Click(object sender, RoutedEventArgs e)
@@ -40,14 +45,48 @@ namespace QOI.NET
 
         private void LoadImage(string filePath)
         {
+            string fileName = System.IO.Path.GetFileName(filePath);
+            try
+            {
+                if (!TryLoadQoiImage(filePath))
+                {
+                    LoadPngImage(filePath);
+                }
+            }
+            catch (NotSupportedException)
+            {
+                MessageBox.Show($"Unsupported image type: {fileName}",
+                                "Cannot read image",
+                                MessageBoxButton.OK,
+                                MessageBoxImage.Warning);
+            }
+            catch (Exception e)
+            {
+                MessageBox.Show($"Error while reading file \"{fileName}\":\n{e.Message}",
+                                "Error",
+                                MessageBoxButton.OK,
+                                MessageBoxImage.Error);
+            }
+        }
+
+        private void LoadPngImage(string filePath)
+        {
+            BitmapImage bmpSource = new(new(filePath));
+            ImageViewer.Source = bmpSource;
+        }
+
+        private bool TryLoadQoiImage(string filePath)
+        {
             try
             {
                 using var fileStream = File.OpenRead(filePath);
                 ImageViewer.Source = new QoiDecoder().Read(fileStream).ToImageSource();
+                return true;
+
             }
-            catch (FormatException)
+            catch (NotSupportedException)
             {
-                ImageViewer.Source = new Bitmap(filePath).ToImageSource();
+                return false;
             }
         }
     }

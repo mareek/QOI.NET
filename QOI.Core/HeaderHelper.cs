@@ -39,7 +39,7 @@ internal static class HeaderHelper
         stream.Read(header);
 
         if (!header[0..4].SequenceEqual(MagicBytes))
-            throw new FormatException("This is not a valid QOI image");
+            throw new NotSupportedException("This is not a valid QOI image");
 
         var width = BinaryPrimitives.ReadUInt32BigEndian(header[4..8]);
         var height = BinaryPrimitives.ReadUInt32BigEndian(header[8..12]);
