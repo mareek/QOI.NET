@@ -1,5 +1,4 @@
-﻿using System;
-using System.Drawing;
+﻿using System.Drawing;
 using System.IO;
 using QOI.Core;
 
@@ -17,7 +16,8 @@ public class QoiBitmapDecoder
 
     public Bitmap Read(Stream stream)
     {
-        var qoiImage = _qoiDecoder.Read(stream);
-        return qoiImage.ToBitmap();
+        var imageWriter = new BitmapImageWriter();
+        _qoiDecoder.Read(stream, imageWriter);
+        return imageWriter.GetImage();
     }
 }
