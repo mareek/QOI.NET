@@ -1,16 +1,20 @@
 ﻿using System;
+using QOI.Core.Interface;
 
 namespace QOI.Core.Chunk;
 
 internal class DiffReader : IChunkReader
 {
+    private const short MinDiff = -2;
+
     public int ChunkLength => 1;
 
-    public void WritePixels(QoiColor[] pixels, ref int currentPixel, ReadOnlySpan<byte> chunk)
+    public QoiColor WritePixels(IImageWriter imageWriter, ReadOnlySpan<byte> chunk, QoiColor previousPixel)
     {
         var diff = ParseDiff(chunk[0]);
-        var previousPixel = ChunkHelper.GetPreviousPixel(pixels, currentPixel);
-        pixels[currentPixel] = diff.GetPixel(previousPixel);
+        var pixel = diff.GetPixel(previousPixel);
+        imageWriter.WritePixel(pixel.R, pixel.G, pixel.B, pixel.A);
+        return pixel;
     }
 
     private QoiColorDiff ParseDiff(byte chunk)
@@ -20,12 +24,13 @@ internal class DiffReader : IChunkReader
         // 2-bit green channel difference from the previous pixel -2..1
         // 2-bit blue channel difference from the previous pixel -2..1
 
-        int rDiff = TruncateToBits((chunk >> 4), 2) + ChunkHelper.MinDiff;
-        int gDiff = TruncateToBits((chunk >> 2), 2) + ChunkHelper.MinDiff;
-        int bDiff = TruncateToBits(chunk, 2) + ChunkHelper.MinDiff;
+        int rDiff = TruncateToBits((chunk >> 4), 2) + MinDiff;
+        int gDiff = TruncateToBits((chunk >> 2), 2) + MinDiff;
+        int bDiff = TruncateToBits(chunk, 2) + MinDiff;
         return new((short)rDiff, (short)gDiff, (short)bDiff);
     }
 
     private static int TruncateToBits(int number, byte bitCount)
         => number & ((1 << bitCount) - 1);
+
 }

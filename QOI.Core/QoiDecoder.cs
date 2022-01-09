@@ -1,6 +1,7 @@
 ﻿using System;
 using System.IO;
 using QOI.Core.Chunk;
+using QOI.Core.Interface;
 
 namespace QOI.Core;
 
@@ -15,19 +16,24 @@ public class QoiDecoder
 
     public QoiImage Read(Stream stream)
     {
-        var (width, height, hasAlpha, isSrgb) = HeaderHelper.ReadHeader(stream);
-
-        QoiColor[] pixels = DecodePixels(stream, width, height);
-
-        return new QoiImage(width, height, hasAlpha, isSrgb, pixels);
+        var imageWriter = new QoiImageWriter();
+        Read(stream, imageWriter);
+        return imageWriter.GetImage();
     }
 
-    private QoiColor[] DecodePixels(Stream stream, uint width, uint height)
+    public void Read(Stream stream, IImageWriter imageWriter)
     {
-        QoiColor[] pixels = new QoiColor[(height * width)];
+        var (width, height, hasAlpha, isSrgb) = HeaderHelper.ReadHeader(stream);
+
+        imageWriter.Init(width, height, hasAlpha, isSrgb);
+        DecodePixels(stream, imageWriter);
+    }
+
+    private void DecodePixels(Stream stream, IImageWriter imageWriter)
+    {
         Span<byte> chunkBuffer = stackalloc byte[5];
-        var currentPixelIndex = 0;
-        while (currentPixelIndex < pixels.Length)
+        var previousPixel = QoiColor.FromArgb(255, 0, 0, 0);
+        while (!imageWriter.IsComplete)
         {
             stream.Read(chunkBuffer[0..1]);
             var chunkReader = ChunkReaderSelector(chunkBuffer[0]);
@@ -36,13 +42,10 @@ public class QoiDecoder
                 stream.Read(chunkBuffer[1..chunkReader.ChunkLength]);
             }
 
-            chunkReader.WritePixels(pixels, ref currentPixelIndex, chunkBuffer[0..chunkReader.ChunkLength]);
+            previousPixel = chunkReader.WritePixels(imageWriter, chunkBuffer[0..chunkReader.ChunkLength], previousPixel);
 
-            _indexReader.AddToIndex(pixels[currentPixelIndex]);
-            currentPixelIndex += 1;
+            _indexReader.AddToIndex(previousPixel);
         }
-
-        return pixels;
     }
 
     private IChunkReader ChunkReaderSelector(byte tagByte)
@@ -59,7 +62,7 @@ public class QoiDecoder
             return _diffReader;
         if (Tag.LUMA.IsPresent(tagByte))
             return _lumaReader;
-        
+
         throw new FormatException($"Unknown tag : {tagByte:X4}");
     }
 }

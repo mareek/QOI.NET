@@ -1,4 +1,5 @@
 ﻿using System;
+using QOI.Core.Interface;
 
 namespace QOI.Core.Chunk
 {
@@ -6,11 +7,12 @@ namespace QOI.Core.Chunk
     {
         public int ChunkLength => 2;
 
-        public void WritePixels(QoiColor[] pixels, ref int currentPixel, ReadOnlySpan<byte> chunk)
+        public QoiColor WritePixels(IImageWriter imageWriter, ReadOnlySpan<byte> chunk, QoiColor previousPixel)
         {
-            var previousPixel = ChunkHelper.GetPreviousPixel(pixels, currentPixel);
             QoiColorDiff diff = ReadDiff(chunk);
-            pixels[currentPixel] = diff.GetPixel(previousPixel);
+            var pixel = diff.GetPixel(previousPixel);
+            imageWriter.WritePixel(pixel.R, pixel.G, pixel.B, pixel.A);
+            return pixel;
         }
 
         private QoiColorDiff ReadDiff(ReadOnlySpan<byte> chunk)
