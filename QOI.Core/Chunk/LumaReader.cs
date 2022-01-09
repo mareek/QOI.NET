@@ -4,11 +4,7 @@ namespace QOI.Core.Chunk
 {
     internal class LumaReader : IChunkReader
     {
-        public bool CanReadChunk(byte tagByte, out int chunkLength)
-        {
-            chunkLength = 2;
-            return Tag.LUMA.IsPresent(tagByte);
-        }
+        public int ChunkLength => 2;
 
         public void WritePixels(QoiColor[] pixels, ref int currentPixel, ReadOnlySpan<byte> chunk)
         {

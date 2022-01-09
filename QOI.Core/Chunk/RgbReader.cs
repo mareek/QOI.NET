@@ -4,11 +4,7 @@ namespace QOI.Core.Chunk;
 
 internal class RgbReader : IChunkReader
 {
-    public bool CanReadChunk(byte tagByte, out int chunkLength)
-    {
-        chunkLength = 4;
-        return Tag.RGB.IsPresent(tagByte);
-    }
+    public int ChunkLength => 4;
 
     public void WritePixels(QoiColor[] pixels, ref int currentPixel, ReadOnlySpan<byte> chunk)
     {

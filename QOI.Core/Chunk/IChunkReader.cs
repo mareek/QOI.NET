@@ -4,6 +4,6 @@ namespace QOI.Core.Chunk;
 
 internal interface IChunkReader
 {
-    bool CanReadChunk(byte tagByte, out int chunkLength);
+    int ChunkLength { get; }
     void WritePixels(QoiColor[] pixels, ref int currentPixel, ReadOnlySpan<byte> chunk);
 }

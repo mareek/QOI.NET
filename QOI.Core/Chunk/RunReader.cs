@@ -4,11 +4,7 @@ namespace QOI.Core.Chunk;
 
 internal class RunReader : IChunkReader
 {
-    public bool CanReadChunk(byte tagByte, out int chunkLength)
-    {
-        chunkLength = 1;
-        return Tag.RUN.IsPresent(tagByte);
-    }
+    public int ChunkLength => 1;
 
     public void WritePixels(QoiColor[] pixels, ref int currentPixel, ReadOnlySpan<byte> chunk)
     {

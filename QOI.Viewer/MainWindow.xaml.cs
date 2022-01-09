@@ -80,7 +80,8 @@ namespace QOI.NET
             try
             {
                 using var fileStream = File.OpenRead(filePath);
-                ImageViewer.Source = new QoiDecoder().Read(fileStream).ToImageSource();
+                QoiImage qoiImage = new QoiDecoder().Read(fileStream);
+                ImageViewer.Source = qoiImage.ToImageSource();
                 return true;
 
             }

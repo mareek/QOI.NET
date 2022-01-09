@@ -30,13 +30,13 @@ public class QoiDecoder
         while (currentPixelIndex < pixels.Length)
         {
             stream.Read(chunkBuffer[0..1]);
-            var chunkReader = ChunkReaderSelector(chunkBuffer[0], out int chunkLength);
-            if (chunkLength > 1)
+            var chunkReader = ChunkReaderSelector(chunkBuffer[0]);
+            if (chunkReader.ChunkLength > 1)
             {
-                stream.Read(chunkBuffer[1..chunkLength]);
+                stream.Read(chunkBuffer[1..chunkReader.ChunkLength]);
             }
 
-            chunkReader.WritePixels(pixels, ref currentPixelIndex, chunkBuffer[0..chunkLength]);
+            chunkReader.WritePixels(pixels, ref currentPixelIndex, chunkBuffer[0..chunkReader.ChunkLength]);
 
             _indexReader.AddToIndex(pixels[currentPixelIndex]);
             currentPixelIndex += 1;
@@ -45,19 +45,19 @@ public class QoiDecoder
         return pixels;
     }
 
-    private IChunkReader ChunkReaderSelector(byte tagByte, out int chunkLength)
+    private IChunkReader ChunkReaderSelector(byte tagByte)
     {
-        if (_rgbaReader.CanReadChunk(tagByte, out chunkLength))
+        if (Tag.RGBA.IsPresent(tagByte))
             return _rgbaReader;
-        if (_rgbReader.CanReadChunk(tagByte, out chunkLength))
+        if (Tag.RGB.IsPresent(tagByte))
             return _rgbReader;
-        if (_runReader.CanReadChunk(tagByte, out chunkLength))
+        if (Tag.RUN.IsPresent(tagByte))
             return _runReader;
-        if (_indexReader.CanReadChunk(tagByte, out chunkLength))
+        if (Tag.INDEX.IsPresent(tagByte))
             return _indexReader;
-        if (_diffReader.CanReadChunk(tagByte, out chunkLength))
+        if (Tag.DIFF.IsPresent(tagByte))
             return _diffReader;
-        if (_lumaReader.CanReadChunk(tagByte, out chunkLength))
+        if (Tag.LUMA.IsPresent(tagByte))
             return _lumaReader;
         
         throw new FormatException($"Unknown tag : {tagByte:X4}");
