@@ -14,7 +14,7 @@ public class QoiEncoder
 
     public void Write(QoiImage image, Stream stream)
     {
-        HeaderHelper.WriteHeader(stream, image.Width, image.Height, image.HasAlpha, image.ColorSpace);
+        HeaderHelper.WriteHeader(stream, image.Width, image.Height, image.HasAlpha, image.IsSrgb);
         EncodePixels(image.Pixels, stream);
         WriteFooter(stream);
     }

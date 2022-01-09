@@ -15,11 +15,11 @@ public class QoiDecoder
 
     public QoiImage Read(Stream stream)
     {
-        var (width, height, hasAlpha, colorSpace) = HeaderHelper.ReadHeader(stream);
+        var (width, height, hasAlpha, isSrgb) = HeaderHelper.ReadHeader(stream);
 
         QoiColor[] pixels = DecodePixels(stream, width, height);
 
-        return new QoiImage(width, height, hasAlpha, colorSpace, pixels);
+        return new QoiImage(width, height, hasAlpha, isSrgb, pixels);
     }
 
     private QoiColor[] DecodePixels(Stream stream, uint width, uint height)
