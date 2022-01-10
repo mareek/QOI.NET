@@ -17,7 +17,7 @@ using System.Windows.Shapes;
 using Microsoft.Win32;
 using QOI.Core;
 
-namespace QOI.NET
+namespace QOI.Viewer
 {
     /// <summary>
     /// Interaction logic for MainWindow.xaml
@@ -79,11 +79,11 @@ namespace QOI.NET
         {
             try
             {
+                var imageWriter = new BitmapSourceImageWriter();
                 using var fileStream = File.OpenRead(filePath);
-                QoiImage qoiImage = new QoiDecoder().Read(fileStream);
-                ImageViewer.Source = qoiImage.ToImageSource();
+                new QoiDecoder().Read(fileStream, imageWriter);
+                ImageViewer.Source = imageWriter.GetImage();
                 return true;
-
             }
             catch (NotSupportedException)
             {

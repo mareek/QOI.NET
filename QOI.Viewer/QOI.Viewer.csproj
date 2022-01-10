@@ -13,7 +13,6 @@
 
   <ItemGroup>
     <ProjectReference Include="..\QOI.Core\QOI.Core.csproj" />
-    <ProjectReference Include="..\QOI.NET\QOI.NET.csproj" />
   </ItemGroup>
 
 </Project>

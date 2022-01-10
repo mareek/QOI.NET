@@ -14,13 +14,6 @@ public class QoiDecoder
     private readonly DiffReader _diffReader = new();
     private readonly LumaReader _lumaReader = new();
 
-    public QoiImage Read(Stream stream)
-    {
-        var imageWriter = new QoiImageWriter();
-        Read(stream, imageWriter);
-        return imageWriter.GetImage();
-    }
-
     public void Read(Stream stream, IImageWriter imageWriter)
     {
         var (width, height, hasAlpha, isSrgb) = HeaderHelper.ReadHeader(stream);
