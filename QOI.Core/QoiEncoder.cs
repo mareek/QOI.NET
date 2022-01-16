@@ -9,6 +9,7 @@ public class QoiEncoder
     private readonly RunWriter _runWriter = new();
     private readonly IndexWriter _indexWriter = new();
     private readonly DiffWriter _diffWriter = new();
+    private readonly LumaWriter _lumaWriter = new();
     private readonly RgbaWriter _rgbaWriter = new();
     private readonly RgbWriter _rgbWriter = new();
 
@@ -43,6 +44,10 @@ public class QoiEncoder
             else if (_diffWriter.CanHandlePixel(currentPixel, previousPixel, out var diff))
             {
                 _diffWriter.WriteChunk(diff, stream);
+            }
+            else if (_lumaWriter.CanHandlePixel(diff))
+            {
+                _lumaWriter.WriteChunk(diff, stream);
             }
             else if (_rgbWriter.CanHandlePixel(currentPixel, previousPixel))
             {
