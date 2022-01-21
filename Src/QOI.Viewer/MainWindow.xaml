@@ -6,9 +6,9 @@
         xmlns:local="clr-namespace:QOI.Viewer"
         mc:Ignorable="d"
         Title="MainWindow" Height="450" Width="800"
-        WindowStartupLocation="CenterScreen">
+        WindowStartupLocation="CenterScreen"
+        KeyDown="Window_KeyDown">
     <DockPanel>
-        <Button DockPanel.Dock="Bottom" Click="Button_Click" Margin="3px" Padding="3px">Load</Button>
         <Image Name="ImageViewer"/>
     </DockPanel>
 </Window>

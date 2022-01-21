@@ -24,63 +24,115 @@ namespace QOI.Viewer
     /// </summary>
     public partial class MainWindow : Window
     {
+        private static readonly string[] SupportedExtensions = { "qoi", "png", "jpg", "jpeg", "bmp" };
+
+        private FileInfo? _currentFile;
+
         public MainWindow()
         {
             InitializeComponent();
             var args = Environment.GetCommandLineArgs();
             if (args.Length > 1 && File.Exists(args[1]))
             {
-                LoadImage(args[1]);
+                InitFile(args[1]);
+            }
+            else
+            {
+                ChooseFile();
             }
         }
 
-        private void Button_Click(object sender, RoutedEventArgs e)
+        private void ChooseFile()
         {
-            OpenFileDialog openFileDialog = new();
+            OpenFileDialog openFileDialog = new()
+            {
+                CheckFileExists = true,
+                Multiselect = false,
+                Filter = $"Images|{string.Join(";", SupportedExtensions.Select(e => $"*.{e}"))}"
+            };
             if (openFileDialog.ShowDialog() ?? false)
             {
-                LoadImage(openFileDialog.FileName);
+                InitFile(openFileDialog.FileName);
             }
         }
 
-        private void LoadImage(string filePath)
+        private void Window_KeyDown(object sender, KeyEventArgs e)
         {
-            string fileName = System.IO.Path.GetFileName(filePath);
+            if (e.Key == Key.Left) 
+                LoadPreviousImage();
+            else if (e.Key == Key.Right)
+                LoadNextImage();
+        }
+
+        private void LoadNextImage() => LoadAnotherImage(1);
+        private void LoadPreviousImage() => LoadAnotherImage(-1);
+
+        private void LoadAnotherImage(int direction)
+        {
+            if (_currentFile == null || _currentFile.Directory == null)
+                return;
+
+            var currentDirSupportedFiles = _currentFile.Directory.EnumerateFiles()
+                                                                 .Where(IsSupportedFile)
+                                                                 .Select(f => f.FullName)
+                                                                 .ToList();
+
+            var currentIndex = currentDirSupportedFiles.IndexOf(_currentFile.FullName);
+            var futureIndex = currentIndex + direction;
+            if (0 <= futureIndex && futureIndex < currentDirSupportedFiles.Count)
+            {
+                InitFile(currentDirSupportedFiles[futureIndex]);
+            }
+        }
+
+        private static bool IsSupportedFile(FileInfo file)
+            => SupportedExtensions.Any(e => file.Extension.Equals($".{e}", StringComparison.OrdinalIgnoreCase));
+
+        private void InitFile(string filePath)
+        {
+            _currentFile = new FileInfo(filePath);
+            LoadImage(_currentFile);
+        }
+
+        private void LoadImage(FileInfo file)
+        {
+            Title = $"QOI Viewer: {file.Name}";
+
             try
             {
-                if (!TryLoadQoiImage(filePath))
+                if (!TryLoadQoiImage(file))
                 {
-                    LoadPngImage(filePath);
+                    LoadPngImage(file);
                 }
             }
             catch (NotSupportedException)
             {
-                MessageBox.Show($"Unsupported image type: {fileName}",
+                MessageBox.Show($"Unsupported image type: {file.Name}",
                                 "Cannot read image",
                                 MessageBoxButton.OK,
                                 MessageBoxImage.Warning);
             }
             catch (Exception e)
             {
-                MessageBox.Show($"Error while reading file \"{fileName}\":\n{e.Message}",
+                MessageBox.Show($"Error while reading file \"{file.Name}\":\n{e.Message}",
                                 "Error",
                                 MessageBoxButton.OK,
                                 MessageBoxImage.Error);
             }
         }
 
-        private void LoadPngImage(string filePath)
+        private void LoadPngImage(FileInfo file)
         {
-            BitmapImage bmpSource = new(new(filePath));
+            BitmapImage bmpSource = new(new(file.FullName));
             ImageViewer.Source = bmpSource;
         }
 
-        private bool TryLoadQoiImage(string filePath)
+        private bool TryLoadQoiImage(FileInfo file)
         {
             try
             {
                 var imageWriter = new BitmapSourceImageWriter();
-                using var fileStream = File.OpenRead(filePath);
+                using var fileStream = File.OpenRead(file.FullName);
                 new QoiDecoder().Read(fileStream, imageWriter);
                 ImageViewer.Source = imageWriter.GetImage();
                 return true;
