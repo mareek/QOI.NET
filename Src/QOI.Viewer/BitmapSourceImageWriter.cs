@@ -20,13 +20,15 @@ internal class BitmapSourceImageWriter : RawPixelsImageWriter
     {
         if (_rawPixels == null) throw new ArgumentNullException("Image has not been initialized");
 
-        return BitmapSource.Create(_width,
-                                   _height,
-                                   96,
-                                   96,
-                                   System.Windows.Media.PixelFormats.Bgra32,
-                                   null,
-                                   _rawPixels,
-                                   _width * PixelSize);
+        var bitmapSource = BitmapSource.Create(_width,
+                                               _height,
+                                               96,
+                                               96,
+                                               System.Windows.Media.PixelFormats.Bgra32,
+                                               null,
+                                               _rawPixels,
+                                               _width * PixelSize);
+        bitmapSource.Freeze();
+        return bitmapSource;
     }
 }

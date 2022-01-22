@@ -58,7 +58,7 @@ namespace QOI.Viewer
 
         private void Window_KeyDown(object sender, KeyEventArgs e)
         {
-            if (e.Key == Key.Left) 
+            if (e.Key == Key.Left)
                 LoadPreviousImage();
             else if (e.Key == Key.Right)
                 LoadNextImage();
@@ -79,6 +79,7 @@ namespace QOI.Viewer
 
             var currentIndex = currentDirSupportedFiles.IndexOf(_currentFile.FullName);
             var futureIndex = currentIndex + direction;
+
             if (0 <= futureIndex && futureIndex < currentDirSupportedFiles.Count)
             {
                 InitFile(currentDirSupportedFiles[futureIndex]);
@@ -91,56 +92,63 @@ namespace QOI.Viewer
         private void InitFile(string filePath)
         {
             _currentFile = new FileInfo(filePath);
-            LoadImage(_currentFile);
-        }
-
-        private void LoadImage(FileInfo file)
-        {
-            Title = $"QOI Viewer: {file.Name}";
 
             try
             {
-                if (!TryLoadQoiImage(file))
-                {
-                    LoadPngImage(file);
-                }
+                Title = $"QOI Viewer: {_currentFile.Name}";
+                ImageViewer.Source = LoadImage(_currentFile);
             }
             catch (NotSupportedException)
             {
-                MessageBox.Show($"Unsupported image type: {file.Name}",
+                MessageBox.Show($"Unsupported image type: {_currentFile.Name}",
                                 "Cannot read image",
                                 MessageBoxButton.OK,
                                 MessageBoxImage.Warning);
             }
             catch (Exception e)
             {
-                MessageBox.Show($"Error while reading file \"{file.Name}\":\n{e.Message}",
+                MessageBox.Show($"Error while reading file \"{_currentFile.Name}\":\n{e.Message}",
                                 "Error",
                                 MessageBoxButton.OK,
                                 MessageBoxImage.Error);
             }
         }
 
-        private void LoadPngImage(FileInfo file)
+        private ImageSource LoadImage(FileInfo file)
         {
-            BitmapImage bmpSource = new(new(file.FullName));
-            ImageViewer.Source = bmpSource;
+            using var fileContent = new MemoryStream();
+            using var fileStream = file.OpenRead();
+            fileStream.CopyTo(fileContent);
+
+            fileContent.Position = 0;
+            bool isQoiImage = QoiDecoder.IsQoiImage(fileContent);
+            fileContent.Position = 0;
+
+            return isQoiImage
+                ? LoadQoiImage(fileContent)
+                : LoadNonQoiImage(fileContent);
         }
 
-        private bool TryLoadQoiImage(FileInfo file)
+        private ImageSource LoadNonQoiImage(Stream fileStream)
         {
-            try
-            {
-                var imageWriter = new BitmapSourceImageWriter();
-                using var fileStream = File.OpenRead(file.FullName);
-                new QoiDecoder().Read(fileStream, imageWriter);
-                ImageViewer.Source = imageWriter.GetImage();
-                return true;
-            }
-            catch (NotSupportedException)
-            {
-                return false;
-            }
+            BitmapImage bmpSource = new();
+         
+            bmpSource.BeginInit();
+            bmpSource.CreateOptions = BitmapCreateOptions.PreservePixelFormat;
+            bmpSource.CacheOption = BitmapCacheOption.OnLoad;
+            bmpSource.StreamSource = fileStream;
+            bmpSource.EndInit();
+            
+            bmpSource.Freeze();
+            
+            return bmpSource;
+        }
+
+        private ImageSource LoadQoiImage(Stream fileStream)
+        {
+            BitmapSourceImageWriter imageWriter = new();
+            new QoiDecoder().Read(fileStream, imageWriter);
+            return imageWriter.GetImage();
         }
     }
 }

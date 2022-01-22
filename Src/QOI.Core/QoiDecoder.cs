@@ -14,6 +14,14 @@ public class QoiDecoder
     private readonly DiffReader _diffReader = new();
     private readonly LumaReader _lumaReader = new();
 
+    public static bool IsQoiImage(Stream stream)
+    {
+        Span<byte> firstBytes = stackalloc byte[HeaderHelper.MagicBytes.Length];
+
+        stream.Read(firstBytes);
+        return firstBytes.SequenceEqual(HeaderHelper.MagicBytes);
+    }
+
     public void Read(Stream stream, IImageWriter imageWriter)
     {
         var (width, height, hasAlpha, isSrgb) = HeaderHelper.ReadHeader(stream);
