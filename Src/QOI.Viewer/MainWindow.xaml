@@ -9,6 +9,24 @@
         WindowStartupLocation="CenterScreen"
         KeyDown="Window_KeyDown">
     <DockPanel>
-        <Image Name="ImageViewer"/>
+        <ItemsControl Name="ThumbnailList" DockPanel.Dock="Bottom" MaxHeight="80px" Opacity="0.5" >
+            <ItemsControl.ItemsPanel>
+                <ItemsPanelTemplate>
+                    <StackPanel Orientation="Horizontal" HorizontalAlignment="Center"/>
+                </ItemsPanelTemplate>
+            </ItemsControl.ItemsPanel>
+            <ItemsControl.ItemTemplate>
+                <DataTemplate>
+                    <Image Source="{Binding}" 
+                           Width="75px" 
+                           Height="75px" 
+                           Margin="5px" 
+                           Stretch="Uniform"
+                           HorizontalAlignment="Center"
+                           VerticalAlignment="Center"/>
+                </DataTemplate>
+            </ItemsControl.ItemTemplate>
+        </ItemsControl>
+        <Grid></Grid>
     </DockPanel>
 </Window>

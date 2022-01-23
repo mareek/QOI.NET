@@ -96,7 +96,9 @@ namespace QOI.Viewer
             try
             {
                 Title = $"QOI Viewer: {_currentFile.Name}";
-                ImageViewer.Source = LoadImage(_currentFile);
+                var image = LoadImage(_currentFile);
+                Background = new ImageBrush(image) { Stretch = Stretch.Uniform };
+                InitThumbnails();
             }
             catch (NotSupportedException)
             {
@@ -112,6 +114,35 @@ namespace QOI.Viewer
                                 MessageBoxButton.OK,
                                 MessageBoxImage.Error);
             }
+        }
+
+        private void InitThumbnails()
+        {
+            var truc = GetThumbnailFiles().ToList();
+
+
+            ThumbnailList.ItemsSource = truc.Select(LoadImage).ToArray();
+        }
+
+        private IEnumerable<FileInfo> GetThumbnailFiles()
+        {
+            if (_currentFile == null || _currentFile.Directory == null)
+                yield break;
+
+            var currentDirSupportedFiles = _currentFile.Directory.EnumerateFiles()
+                                                                 .Where(IsSupportedFile)
+                                                                 .Select(f => f.FullName)
+                                                                 .ToList();
+            var currentIndex = currentDirSupportedFiles.IndexOf(_currentFile.FullName);
+            var firstIndex = Math.Max(currentIndex - 3, 0);
+            var lastIndex = Math.Min(currentIndex + 3, currentDirSupportedFiles.Count - 1);
+
+            List<ImageSource> thumbnails = new();
+            for (int i = firstIndex; i <= lastIndex; i++)
+            {
+                yield return new FileInfo(currentDirSupportedFiles[i]);
+            }
+
         }
 
         private ImageSource LoadImage(FileInfo file)
@@ -132,15 +163,15 @@ namespace QOI.Viewer
         private ImageSource LoadNonQoiImage(Stream fileStream)
         {
             BitmapImage bmpSource = new();
-         
+
             bmpSource.BeginInit();
             bmpSource.CreateOptions = BitmapCreateOptions.PreservePixelFormat;
             bmpSource.CacheOption = BitmapCacheOption.OnLoad;
             bmpSource.StreamSource = fileStream;
             bmpSource.EndInit();
-            
+
             bmpSource.Freeze();
-            
+
             return bmpSource;
         }
 
