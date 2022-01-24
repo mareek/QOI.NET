@@ -27,6 +27,7 @@ namespace QOI.Viewer
         private static readonly string[] SupportedExtensions = { "qoi", "png", "jpg", "jpeg", "bmp" };
 
         private FileInfo? _currentFile;
+        private SimpleCache<ImageSource> _imageCache = new(10);
 
         public MainWindow()
         {
@@ -96,7 +97,7 @@ namespace QOI.Viewer
             try
             {
                 Title = $"QOI Viewer: {_currentFile.Name}";
-                var image = LoadImage(_currentFile);
+                var image = GetImage(_currentFile);
                 Background = new ImageBrush(image) { Stretch = Stretch.Uniform };
                 InitThumbnails();
             }
@@ -118,10 +119,8 @@ namespace QOI.Viewer
 
         private void InitThumbnails()
         {
-            var truc = GetThumbnailFiles().ToList();
-
-
-            ThumbnailList.ItemsSource = truc.Select(LoadImage).ToArray();
+            ThumbnailList.ItemsSource = GetThumbnailFiles().Select(GetImage)
+                                                           .ToArray();
         }
 
         private IEnumerable<FileInfo> GetThumbnailFiles()
@@ -142,8 +141,9 @@ namespace QOI.Viewer
             {
                 yield return new FileInfo(currentDirSupportedFiles[i]);
             }
-
         }
+
+        private ImageSource GetImage(FileInfo file) => _imageCache.GetOrAdd(file.FullName, _ => LoadImage(file));
 
         private ImageSource LoadImage(FileInfo file)
         {
@@ -165,7 +165,6 @@ namespace QOI.Viewer
             BitmapImage bmpSource = new();
 
             bmpSource.BeginInit();
-            bmpSource.CreateOptions = BitmapCreateOptions.PreservePixelFormat;
             bmpSource.CacheOption = BitmapCacheOption.OnLoad;
             bmpSource.StreamSource = fileStream;
             bmpSource.EndInit();
