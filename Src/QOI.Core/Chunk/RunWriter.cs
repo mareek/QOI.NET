@@ -1,4 +1,4 @@
-﻿using System;
+﻿using System.Collections.Generic;
 using System.IO;
 
 namespace QOI.Core.Chunk;
@@ -9,12 +9,12 @@ internal class RunWriter
 
     public bool CanHandlePixel(QoiColor currentPixel, QoiColor previousPixel) => currentPixel == previousPixel;
 
-    public void WriteChunk(ReadOnlySpan<QoiColor> pixels, int currentPixel, QoiColor previousPixel, Stream stream, out int runLength)
+    public void WriteChunk(IEnumerator<QoiColor> pixelEnnumerator, QoiColor previousPixel, Stream stream, out bool endOfFile)
     {
-        runLength = 0;
+        int runLength = 1;
         while (runLength < MaxRunLength
-               && (currentPixel + runLength) < pixels.Length
-               && pixels[currentPixel + runLength] == previousPixel)
+               && pixelEnnumerator.MoveNext()
+               && pixelEnnumerator.Current == previousPixel)
         {
             runLength++;
         }
@@ -22,5 +22,7 @@ internal class RunWriter
         // 6-bit run-length repeating the previous pixel: 1..62
         byte value = (byte)(runLength - 1);
         stream.WriteByte(Tag.RUN.Apply(value));
+
+        endOfFile = runLength < MaxRunLength && pixelEnnumerator.Current == previousPixel;
     }
 }

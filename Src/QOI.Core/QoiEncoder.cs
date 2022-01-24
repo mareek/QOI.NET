@@ -1,5 +1,7 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.IO;
+using System.Linq;
 using QOI.Core.Chunk;
 
 namespace QOI.Core;
@@ -13,31 +15,35 @@ public class QoiEncoder
     private readonly RgbaWriter _rgbaWriter = new();
     private readonly RgbWriter _rgbWriter = new();
 
-    public void Write(QoiImage image, Stream stream)
+
+    public void Write(uint width, uint height, bool hasAlpha, bool isSrgb,
+                      IEnumerable<(byte r, byte g, byte b, byte a)> pixels, Stream stream)
     {
-        HeaderHelper.WriteHeader(stream, image.Width, image.Height, image.HasAlpha, image.IsSrgb);
-        EncodePixels(image.Pixels, stream);
+        HeaderHelper.WriteHeader(stream, width, height, hasAlpha, isSrgb);
+        EncodePixels(pixels.Select(p => QoiColor.FromArgb(p.a, p.r, p.g, p.b)), stream);
         WriteFooter(stream);
     }
 
-    private void EncodePixels(ReadOnlySpan<QoiColor> pixels, Stream stream)
+    private void EncodePixels(IEnumerable<QoiColor> pixels, Stream stream)
     {
-        if (pixels.Length == 0)
-            return;
-
         // The decoder and encoder start with { r: 0, g: 0, b: 0, a: 255} as the previous pixel value
         var previousPixel = QoiColor.FromArgb(255, 0, 0, 0);
 
-        for (int currentPixelIndex = 0; currentPixelIndex < pixels.Length; currentPixelIndex++)
+        var pixelEnnumerator = pixels.GetEnumerator();
+        while (pixelEnnumerator.MoveNext())
         {
-            QoiColor currentPixel = pixels[currentPixelIndex];
-
+            var currentPixel = pixelEnnumerator.Current;
             if (_runWriter.CanHandlePixel(currentPixel, previousPixel))
             {
-                _runWriter.WriteChunk(pixels, currentPixelIndex, previousPixel, stream, out int runlength);
-                currentPixelIndex += runlength - 1;
+                _runWriter.WriteChunk(pixelEnnumerator, previousPixel, stream, out bool endOfFile);
+                if (endOfFile)
+                {
+                    break;
+                }
+                currentPixel = pixelEnnumerator.Current;
             }
-            else if (_indexWriter.CanHandlePixel(currentPixel))
+
+            if (_indexWriter.CanHandlePixel(currentPixel))
             {
                 _indexWriter.WriteChunk(currentPixel, stream);
             }
@@ -61,6 +67,7 @@ public class QoiEncoder
             _indexWriter.AddToIndex(currentPixel);
             previousPixel = currentPixel;
         }
+
     }
 
     private static void WriteFooter(Stream stream)
