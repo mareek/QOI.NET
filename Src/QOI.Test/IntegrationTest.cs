@@ -33,8 +33,9 @@ public class IntegrationTest
     [MemberData(nameof(GetImageTestSet))]
     public void FullCircleProcessTest(Bitmap imgTest)
     {
-        QoiBitmapEncoder encoder = new();
-        var imgBytes = encoder.Write(imgTest);
+        using var stream = new MemoryStream();
+        new QoiBitmapEncoder().Write(imgTest, stream);
+        var imgBytes = stream.ToArray();
 
         using MemoryStream decodeStream = new(imgBytes);
         QoiBitmapDecoder decoder = new();
@@ -66,8 +67,10 @@ public class IntegrationTest
     [MemberData(nameof(GetSizeTestSet))]
     public void TestCompressedSize(Bitmap image, int compressedSize)
     {
-        QoiBitmapEncoder encoder = new();
-        Check.That(encoder.Write(image)).HasSize(compressedSize);
+        using var stream = new MemoryStream();
+        new QoiBitmapEncoder().Write(image, stream);
+        var imgBytes = stream.ToArray();
+        Check.That(imgBytes).HasSize(compressedSize);
     }
 
     public static IEnumerable<object[]> GetSizeTestSet()
@@ -152,7 +155,7 @@ public class IntegrationTest
         return image;
     }
 
-    private static Bitmap GetShadedImage(int increment = 1,int width = 8, int height = 6)
+    private static Bitmap GetShadedImage(int increment = 1, int width = 8, int height = 6)
     {
         Bitmap image = new(width, height);
         Color color = Color.Black;

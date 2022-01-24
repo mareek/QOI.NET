@@ -4,30 +4,26 @@ using System.IO;
 using System.Linq;
 using QOI.Core;
 
-namespace QOI.NET
+namespace QOI.NET;
+
+public class QoiBitmapEncoder
 {
-    public class QoiBitmapEncoder
+    private readonly QoiEncoder _qoiEncoder = new();
+
+    public void Write(Bitmap image, Stream stream)
     {
-        private readonly QoiEncoder _qoiEncoder = new();
+        var pixels = GetPixels(image).Select(p => (p.R, p.G, p.B, p.A));
+        _qoiEncoder.Write((uint)image.Width, (uint)image.Height, true, true, pixels, stream);
+    }
 
-        public byte[] Write(Bitmap image)
+    private static IEnumerable<Color> GetPixels(Bitmap image)
+    {
+        for (int y = 0; y < image.Height; y++)
         {
-            using var stream = new MemoryStream();
-            var pixels = GetPixels(image).Select(p => (p.R, p.G, p.B, p.A));
-            _qoiEncoder.Write((uint)image.Width, (uint)image.Height, true, true, pixels, stream);
-            return stream.ToArray();
-        }
-
-        private static IEnumerable<Color> GetPixels(Bitmap image)
-        {
-            for (int y = 0; y < image.Height; y++)
+            for (int x = 0; x < image.Width; x++)
             {
-                for (int x = 0; x < image.Width; x++)
-                {
-                    yield return image.GetPixel(x, y);
-                }
+                yield return image.GetPixel(x, y);
             }
         }
-
     }
 }
