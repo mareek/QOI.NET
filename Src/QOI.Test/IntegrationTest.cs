@@ -11,7 +11,7 @@ public class IntegrationTest
     [InlineData("testcard.png", "testcard.qoi")]
     [InlineData("testcard_rgba.png", "testcard_rgba.qoi")]
     [InlineData("dice.png", "dice.qoi")]
-    public void StandardImagesTest(string referenceFileName, string qoiFileName)
+    public void DecoderStandardImagesTest(string referenceFileName, string qoiFileName)
     {
         var referenceImage = new Bitmap(Path.Combine("TestImages", referenceFileName));
 
@@ -47,7 +47,7 @@ public class IntegrationTest
             {
                 var pixelSrc = imgTest.GetPixel(x, y);
                 var pixelDest = decodedImage.GetPixel(x, y);
-                Check.That(pixelSrc).IsEqualTo(pixelDest);
+                Check.That(pixelDest).IsEqualTo(pixelSrc);
             }
         }
     }
@@ -61,37 +61,9 @@ public class IntegrationTest
         yield return new object[] { GetRandomSimpleImage() };
         yield return new object[] { GetShadedImage() };
         yield return new object[] { GetShadedImage(3) };
-    }
-
-    [Theory(Skip = "wait for final implementation")]
-    [MemberData(nameof(GetSizeTestSet))]
-    public void TestCompressedSize(Bitmap image, int compressedSize)
-    {
-        using var stream = new MemoryStream();
-        new QoiBitmapEncoder().Write(image, stream);
-        var imgBytes = stream.ToArray();
-        Check.That(imgBytes).HasSize(compressedSize);
-    }
-
-    public static IEnumerable<object[]> GetSizeTestSet()
-    {
-        const int HeaderLength = 14;
-        const int colorChunkLength = 5;
-        const int run8ChunkLength = 1;
-        const int run16ChunkLength = 2;
-        const int indexChunkLength = 1;
-        const int diff8ChunkLength = 1;
-        const int diff16ChunkLength = 2;
-
-        yield return new object[] { GetBlankImage(80, 60), HeaderLength + colorChunkLength + run16ChunkLength };
-        yield return new object[] { GetRandomArgbImage(), HeaderLength + colorChunkLength * 8 * 6 };
-        yield return new object[] { GetShadedImage(), HeaderLength + colorChunkLength + diff8ChunkLength * (8 * 6 - 1) };
-        yield return new object[] { GetShadedImage(3), HeaderLength + colorChunkLength + diff16ChunkLength * (8 * 6 - 1) };
-        yield return new object[] { GetRandomStripedImage(), HeaderLength + (colorChunkLength + run8ChunkLength) * 6 };
-        yield return new object[] { GetMonochromeStripedImage(), HeaderLength
-                                                                 + colorChunkLength * 2
-                                                                 + indexChunkLength * 4
-                                                                 + run8ChunkLength * 6 };
+        yield return new object[] { new Bitmap(Path.Combine("TestImages", "testcard.png")) };
+        yield return new object[] { new Bitmap(Path.Combine("TestImages", "testcard_rgba.png")) };
+        yield return new object[] { new Bitmap(Path.Combine("TestImages", "dice.png")) };
     }
 
     private static Bitmap GetBlankImage(int width = 8, int height = 6) => new(width, height);

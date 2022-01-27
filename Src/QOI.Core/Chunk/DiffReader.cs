@@ -27,10 +27,9 @@ internal class DiffReader : IChunkReader
         int rDiff = TruncateToBits((chunk >> 4), 2) + MinDiff;
         int gDiff = TruncateToBits((chunk >> 2), 2) + MinDiff;
         int bDiff = TruncateToBits(chunk, 2) + MinDiff;
-        return new((short)rDiff, (short)gDiff, (short)bDiff);
+        return new(0, (short)rDiff, (short)gDiff, (short)bDiff);
     }
 
     private static int TruncateToBits(int number, byte bitCount)
         => number & ((1 << bitCount) - 1);
-
 }

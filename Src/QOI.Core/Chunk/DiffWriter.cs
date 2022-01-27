@@ -10,13 +10,12 @@ internal class DiffWriter
     public bool CanHandlePixel(QoiColor currentPixel, QoiColor previousPixel, out QoiColorDiff diff)
     {
         static bool IsBetween(short min, short number, short max) => min <= number && number <= max;
-        static bool IsEncodableDiff(short componentDiff) => IsBetween(MinDiff, componentDiff, MaxDiff);
 
         diff = QoiColorDiff.FromPixels(previousPixel, currentPixel);
-        return currentPixel.A == previousPixel.A
-               && IsEncodableDiff(diff.Gdiff)
-               && IsEncodableDiff(diff.Gdiff)
-               && IsEncodableDiff(diff.Bdiff);
+        return diff.Adiff == 0
+               && IsBetween(MinDiff, diff.Rdiff, MaxDiff)
+               && IsBetween(MinDiff, diff.Gdiff, MaxDiff)
+               && IsBetween(MinDiff, diff.Bdiff, MaxDiff);
     }
 
     public void WriteChunk(QoiColorDiff diff, Stream stream)
