@@ -1,5 +1,6 @@
 ﻿using System.Drawing;
 using NFluent;
+using QOI.Core.Debugging;
 using QOI.NET;
 using Xunit;
 
@@ -11,9 +12,9 @@ public class IntegrationTest
     [InlineData("testcard.png", "testcard.qoi")]
     [InlineData("testcard_rgba.png", "testcard_rgba.qoi")]
     [InlineData("dice.png", "dice.qoi")]
-    public void DecoderStandardImagesTest(string referenceFileName, string qoiFileName)
+    public void DecoderStandardImagesTest(string pngFileName, string qoiFileName)
     {
-        var referenceImage = new Bitmap(Path.Combine("TestImages", referenceFileName));
+        var referenceImage = new Bitmap(Path.Combine("TestImages", pngFileName));
 
         QoiBitmapDecoder decoder = new();
         var qoiImage = decoder.Read(Path.Combine("TestImages", qoiFileName));
@@ -27,6 +28,29 @@ public class IntegrationTest
                 Check.That(pixelQoi).IsEqualTo(pixelReference);
             }
         }
+    }
+
+    [Theory(Skip = "need to fix bugs first")]
+    [InlineData("testcard.png", "testcard.qoi")]
+    [InlineData("testcard_rgba.png", "testcard_rgba.qoi")]
+    [InlineData("dice.png", "dice.qoi")]
+    public void EncoderStandardImagesTest(string pngFileName, string qoiFileName)
+    {
+        QoiFileAnalyzer analyzer = new();
+
+        MemoryStream encodedImageStream = new();
+        Bitmap pngImage = new(Path.Combine("TestImages", pngFileName));
+        QoiBitmapEncoder encoder = new();
+        encoder.Write(pngImage, encodedImageStream);
+
+        encodedImageStream.Position = 0;
+        var encodedImageInfo = analyzer.AnalyzeFile($"Encoded {pngFileName}",encodedImageStream);
+        var strEncoded = encodedImageInfo.GetDebugString();
+
+        var referenceImageInfo = analyzer.AnalyzeFile(qoiFileName, File.OpenRead(Path.Combine("TestImages", qoiFileName)));
+        var strReference = referenceImageInfo.GetDebugString();
+
+        Check.That(strEncoded).IsEqualTo(strReference);
     }
 
     [Theory]
