@@ -23,7 +23,8 @@ public class QoiFileInfo
 
     public string GetDebugString()
     {
-        return $"{Width} * {Height}\n"
+        return $"{Name}\n"
+             + $"{Width} * {Height}\n"
              + $"HasAlpha: {HasAlpha}\n"
              + $"IsSrgb: {IsSrgb}\n"
              + $"Chunks: \n"

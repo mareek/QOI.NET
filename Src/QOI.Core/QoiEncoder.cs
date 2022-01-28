@@ -33,12 +33,12 @@ public class QoiEncoder
         while (pixelEnnumerator.MoveNext())
         {
             var currentPixel = pixelEnnumerator.Current;
-            if (_runWriter.CanHandlePixel(currentPixel, previousPixel))
+            while (_runWriter.CanHandlePixel(currentPixel, previousPixel))
             {
                 _runWriter.WriteChunk(pixelEnnumerator, previousPixel, stream, out bool endOfFile);
                 if (endOfFile)
                 {
-                    break;
+                    return;
                 }
                 currentPixel = pixelEnnumerator.Current;
             }
