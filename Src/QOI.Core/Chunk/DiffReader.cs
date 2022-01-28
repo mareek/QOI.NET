@@ -13,7 +13,7 @@ internal class DiffReader : IChunkReader
     {
         var diff = ParseDiff(chunk[0]);
         var pixel = diff.GetPixel(previousPixel);
-        imageWriter.WritePixel(pixel.R, pixel.G, pixel.B, pixel.A);
+        imageWriter.WritePixel(pixel);
         return pixel;
     }
 

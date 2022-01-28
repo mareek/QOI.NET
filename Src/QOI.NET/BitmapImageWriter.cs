@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Drawing;
 using System.Drawing.Imaging;
+using QOI.Core;
 using QOI.Core.Interface;
 
 namespace QOI.NET;
@@ -17,14 +18,14 @@ internal class BitmapImageWriter : IImageWriter
         _bitmap = new Bitmap((int)width, (int)height, PixelFormat.Format32bppArgb);
     }
 
-    public void WritePixel(byte r, byte g, byte b, byte a)
+    public void WritePixel(QoiColor color)
     {
         if (_bitmap == null) throw new ArgumentNullException("Image has not been initialized");
 
         int width = _bitmap.Width;
         var x = _currentIndex % width;
         var y = _currentIndex / width;
-        _bitmap.SetPixel(x, y, Color.FromArgb(a, r, g, b));
+        _bitmap.SetPixel(x, y, Color.FromArgb(color.A, color.R, color.G, color.B));
 
         _currentIndex += 1;
     }

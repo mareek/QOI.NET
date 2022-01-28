@@ -16,7 +16,7 @@ internal class RunReader : IChunkReader
 
         for (int i = 0; i < runLength; i++)
         {
-            imageWriter.WritePixel(previousPixel.R, previousPixel.G, previousPixel.B, previousPixel.A);
+            imageWriter.WritePixel(previousPixel);
         }
 
         return previousPixel;

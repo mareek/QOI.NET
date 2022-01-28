@@ -12,7 +12,7 @@ public class QoiBitmapEncoder
 
     public void Write(Bitmap image, Stream stream)
     {
-        var pixels = GetPixels(image).Select(p => (p.R, p.G, p.B, p.A));
+        var pixels = GetPixels(image).Select(p => QoiColor.FromArgb(p.A, p.R, p.G, p.B));
         _qoiEncoder.Write((uint)image.Width, (uint)image.Height, true, true, pixels, stream);
     }
 

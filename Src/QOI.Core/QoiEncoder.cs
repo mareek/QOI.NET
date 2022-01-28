@@ -1,7 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.IO;
-using System.Linq;
 using QOI.Core.Chunk;
 
 namespace QOI.Core;
@@ -15,12 +14,10 @@ public class QoiEncoder
     private readonly RgbaWriter _rgbaWriter = new();
     private readonly RgbWriter _rgbWriter = new();
 
-
-    public void Write(uint width, uint height, bool hasAlpha, bool isSrgb,
-                      IEnumerable<(byte r, byte g, byte b, byte a)> pixels, Stream stream)
+    public void Write(uint width, uint height, bool hasAlpha, bool isSrgb, IEnumerable<QoiColor> pixels, Stream stream)
     {
         HeaderHelper.WriteHeader(stream, width, height, hasAlpha, isSrgb);
-        EncodePixels(pixels.Select(p => QoiColor.FromArgb(p.a, p.r, p.g, p.b)), stream);
+        EncodePixels(pixels, stream);
         WriteFooter(stream);
     }
 

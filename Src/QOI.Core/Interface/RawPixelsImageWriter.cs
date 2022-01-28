@@ -21,14 +21,14 @@ public abstract class RawPixelsImageWriter : IImageWriter
         _rawPixels = new byte[_width * _height * PixelSize];
     }
 
-    public void WritePixel(byte r, byte g, byte b, byte a)
+    public void WritePixel(QoiColor color)
     {
         if (_rawPixels == null) throw new ArgumentNullException("Image has not been initialized");
 
-        WritePixelBytes(r, g, b, a, _rawPixels.AsSpan(_currentIndex, PixelSize));
+        WritePixelBytes(color, _rawPixels.AsSpan(_currentIndex, PixelSize));
 
         _currentIndex += PixelSize;
     }
 
-    protected abstract void WritePixelBytes(byte r, byte g, byte b, byte a, Span<byte> buffer);
+    protected abstract void WritePixelBytes(QoiColor color, Span<byte> buffer);
 }

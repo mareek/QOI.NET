@@ -11,7 +11,7 @@ internal class LumaReader : IChunkReader
     {
         QoiColorDiff diff = ReadDiff(chunk);
         var pixel = diff.GetPixel(previousPixel);
-        imageWriter.WritePixel(pixel.R, pixel.G, pixel.B, pixel.A);
+        imageWriter.WritePixel(pixel);
         return pixel;
     }
 

@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Windows.Media.Imaging;
+using QOI.Core;
 using QOI.Core.Interface;
 
 namespace QOI.Viewer;
@@ -8,12 +9,12 @@ internal class BitmapSourceImageWriter : RawPixelsImageWriter
 {
     protected override int PixelSize => 4;
 
-    protected override void WritePixelBytes(byte r, byte g, byte b, byte a, Span<byte> buffer)
+    protected override void WritePixelBytes(QoiColor color, Span<byte> buffer)
     {
-        buffer[0] = b;
-        buffer[1] = g;
-        buffer[2] = r;
-        buffer[3] = a;
+        buffer[0] = color.B;
+        buffer[1] = color.G;
+        buffer[2] = color.R;
+        buffer[3] = color.A;
     }
 
     public BitmapSource GetImage()

@@ -14,7 +14,7 @@ internal class IndexReader : IChunkReader
     public QoiColor WritePixels(IImageWriter imageWriter, ReadOnlySpan<byte> chunk, QoiColor previousPixel)
     {
         var pixel = _pixelIndex.Get(chunk[0]);
-        imageWriter.WritePixel(pixel.R, pixel.G, pixel.B, pixel.A);
+        imageWriter.WritePixel(pixel);
         return pixel;
     }
 }

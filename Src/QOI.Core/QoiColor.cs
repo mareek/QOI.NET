@@ -2,7 +2,7 @@
 
 namespace QOI.Core;
 
-internal struct QoiColor : IEquatable<QoiColor>
+public struct QoiColor : IEquatable<QoiColor>
 {
     public byte R { get; }
     public byte G { get; }
@@ -19,6 +19,7 @@ internal struct QoiColor : IEquatable<QoiColor>
 
     public static QoiColor FromArgb(byte a, byte r, byte g, byte b) => new(a, r, g, b);
 
+    public override string ToString() => $"R: {R}, G: {G}, B: {B}, A: {A}";
     public override bool Equals(object? obj) => obj is QoiColor color && Equals(color);
     public bool Equals(QoiColor other) => R == other.R && G == other.G && B == other.B && A == other.A;
     public override int GetHashCode() => HashCode.Combine(R, G, B, A);
