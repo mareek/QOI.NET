@@ -2,12 +2,12 @@
 
 internal struct QoiColorDiff
 {
-    public short Adiff { get; }
-    public short Rdiff { get; }
-    public short Gdiff { get; }
-    public short Bdiff { get; }
+    public sbyte Adiff { get; }
+    public sbyte Rdiff { get; }
+    public sbyte Gdiff { get; }
+    public sbyte Bdiff { get; }
 
-    public QoiColorDiff(short aDiff, short rDiff, short gDiff, short bDiff)
+    public QoiColorDiff(sbyte aDiff, sbyte rDiff, sbyte gDiff, sbyte bDiff)
     {
         Adiff = aDiff;
         Rdiff = rDiff;
@@ -22,8 +22,8 @@ internal struct QoiColorDiff
                              (byte)(basePixel.B + Bdiff));
 
     public static QoiColorDiff FromPixels(QoiColor basePixel, QoiColor diffPixel)
-        => new QoiColorDiff((short)(diffPixel.A - basePixel.A),
-                            (short)(diffPixel.R - basePixel.R),
-                            (short)(diffPixel.G - basePixel.G),
-                            (short)(diffPixel.B - basePixel.B));
+        => new((sbyte)(diffPixel.A - basePixel.A),
+               (sbyte)(diffPixel.R - basePixel.R),
+               (sbyte)(diffPixel.G - basePixel.G),
+               (sbyte)(diffPixel.B - basePixel.B));
 }

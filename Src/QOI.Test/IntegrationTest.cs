@@ -30,7 +30,7 @@ public class IntegrationTest
         }
     }
 
-    [Theory(Skip = "need to fix bugs first")]
+    [Theory]
     [InlineData("testcard.png", "testcard.qoi")]
     [InlineData("testcard_rgba.png", "testcard_rgba.qoi")]
     [InlineData("dice.png", "dice.qoi")]
@@ -45,10 +45,10 @@ public class IntegrationTest
 
         encodedImageStream.Position = 0;
         var encodedImageInfo = analyzer.AnalyzeFile($"Encoded {pngFileName}",encodedImageStream);
-        var strEncoded = encodedImageInfo.GetDebugString();
+        var strEncoded = encodedImageInfo.GetDebugString(false);
 
-        var referenceImageInfo = analyzer.AnalyzeFile(qoiFileName, File.OpenRead(Path.Combine("TestImages", qoiFileName)));
-        var strReference = referenceImageInfo.GetDebugString();
+        var referenceImageInfo = analyzer.AnalyzeFile(new FileInfo(Path.Combine("TestImages", qoiFileName)));
+        var strReference = referenceImageInfo.GetDebugString(false);
 
         Check.That(strEncoded).IsEqualTo(strReference);
     }

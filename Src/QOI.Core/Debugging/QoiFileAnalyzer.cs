@@ -8,11 +8,17 @@ namespace QOI.Core.Debugging;
 
 public class QoiFileAnalyzer
 {
-    public QoiFileInfo AnalyzeFile(string imageName, Stream imageStream)
+    public QoiFileInfo AnalyzeFile(FileInfo file)
     {
-        var (width, height, hasAlpha, isSrgb) = HeaderHelper.ReadHeader(imageStream);
-        var chunks = ReadChunks(imageStream, width * height).ToArray();
-        return new QoiFileInfo(imageName, width, height, hasAlpha, isSrgb, chunks);
+        using var fileStream = file.OpenRead();
+        return AnalyzeFile(file.Name, fileStream);
+    }
+
+    public QoiFileInfo AnalyzeFile(string fileName, Stream fileStream)
+    {
+        var (width, height, hasAlpha, isSrgb) = HeaderHelper.ReadHeader(fileStream);
+        var chunks = ReadChunks(fileStream, width * height).ToArray();
+        return new QoiFileInfo(fileName, width, height, hasAlpha, isSrgb, chunks);
     }
 
     private IEnumerable<QoiChunkInfo> ReadChunks(Stream imageStream, uint totalPixelCount)

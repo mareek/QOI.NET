@@ -4,12 +4,12 @@ namespace QOI.Core.Chunk;
 
 internal class DiffWriter
 {
-    private const short MinDiff = -2;
-    private const short MaxDiff = 1;
+    private const sbyte MinDiff = -2;
+    private const sbyte MaxDiff = 1;
 
     public bool CanHandlePixel(QoiColor currentPixel, QoiColor previousPixel, out QoiColorDiff diff)
     {
-        static bool IsBetween(short min, short number, short max) => min <= number && number <= max;
+        static bool IsBetween(sbyte min, sbyte number, sbyte max) => min <= number && number <= max;
 
         diff = QoiColorDiff.FromPixels(previousPixel, currentPixel);
         return diff.Adiff == 0

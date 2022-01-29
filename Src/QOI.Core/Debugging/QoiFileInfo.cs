@@ -21,13 +21,11 @@ public class QoiFileInfo
     public bool IsSrgb { get; }
     public QoiChunkInfo[] Chunks { get; }
 
-    public string GetDebugString()
-    {
-        return $"{Name}\n"
-             + $"{Width} * {Height}\n"
-             + $"HasAlpha: {HasAlpha}\n"
-             + $"IsSrgb: {IsSrgb}\n"
-             + $"Chunks: \n"
-             + string.Join("\n", Chunks.Select(c => c.GetDebugString()));
-    }
+    public string GetDebugString(bool includeName = true) 
+        => (includeName ? $"{Name}\n" : string.Empty)
+           + $"{Width} * {Height}\n"
+           + $"HasAlpha: {HasAlpha}\n"
+           + $"IsSrgb: {IsSrgb}\n"
+           + $"Chunks: \n"
+           + string.Join("\n", Chunks.Select(c => c.GetDebugString()));
 }
