@@ -8,7 +8,20 @@
         Title="MainWindow" Height="450" Width="800"
         WindowStartupLocation="CenterScreen"
         KeyDown="Window_KeyDown">
+    <Window.Resources>
+        <Style x:Key="NavigationButtonStyle"  TargetType="TextBlock">
+            <Setter Property="FontSize" Value="80"/>
+            <Setter Property="VerticalAlignment" Value="Center"/>
+            <Setter Property="Foreground" Value="White"/>
+            <Setter Property="Opacity" Value="0.5"/>
+            <Setter Property="FontFamily" Value="Consolas"/>
+            <Setter Property="FontWeight" Value="Bold"/>
+            <Setter Property="Padding" Value="5px" />
+        </Style>
+    </Window.Resources>
     <DockPanel>
+        <TextBlock Style="{StaticResource NavigationButtonStyle}" DockPanel.Dock="Left" MouseDown="Prev_MouseDown">&lt;</TextBlock>
+        <TextBlock Style="{StaticResource NavigationButtonStyle}" DockPanel.Dock="Right" MouseDown="Next_MouseDown">&gt;</TextBlock>
         <ItemsControl Name="ThumbnailList" DockPanel.Dock="Bottom" MaxHeight="80px" Opacity="0.5" >
             <ItemsControl.ItemsPanel>
                 <ItemsPanelTemplate>

@@ -65,7 +65,12 @@ namespace QOI.Viewer
                 LoadNextImage();
         }
 
+        private void Prev_MouseDown(object sender, MouseButtonEventArgs e) => LoadPreviousImage();
+
+        private void Next_MouseDown(object sender, MouseButtonEventArgs e) => LoadNextImage();
+
         private void LoadNextImage() => LoadAnotherImage(1);
+
         private void LoadPreviousImage() => LoadAnotherImage(-1);
 
         private void LoadAnotherImage(int direction)

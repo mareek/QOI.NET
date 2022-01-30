@@ -8,7 +8,7 @@ namespace QOI.Test;
 
 public class IntegrationTest
 {
-    private static DirectoryInfo TestImagesDirectory => new DirectoryInfo("TestImages");
+    private static DirectoryInfo TestImagesDirectory => new("TestImages");
 
     [Theory]
     [MemberData(nameof(GetReferenceImageCouples))]
