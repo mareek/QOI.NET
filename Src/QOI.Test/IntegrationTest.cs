@@ -8,16 +8,16 @@ namespace QOI.Test;
 
 public class IntegrationTest
 {
+    private static DirectoryInfo TestImagesDirectory => new DirectoryInfo("TestImages");
+
     [Theory]
-    [InlineData("testcard.png", "testcard.qoi")]
-    [InlineData("testcard_rgba.png", "testcard_rgba.qoi")]
-    [InlineData("dice.png", "dice.qoi")]
-    public void DecoderStandardImagesTest(string pngFileName, string qoiFileName)
+    [MemberData(nameof(GetReferenceImageCouples))]
+    public void DecoderStandardImagesTest(FileInfo pngFile, FileInfo qoiFile)
     {
-        var referenceImage = new Bitmap(Path.Combine("TestImages", pngFileName));
+        var referenceImage = new Bitmap(pngFile.FullName);
 
         QoiBitmapDecoder decoder = new();
-        var qoiImage = decoder.Read(Path.Combine("TestImages", qoiFileName));
+        var qoiImage = decoder.Read(qoiFile.FullName);
 
         for (int y = 0; y < referenceImage.Height; y++)
         {
@@ -31,26 +31,36 @@ public class IntegrationTest
     }
 
     [Theory]
-    [InlineData("testcard.png", "testcard.qoi")]
-    [InlineData("testcard_rgba.png", "testcard_rgba.qoi")]
-    [InlineData("dice.png", "dice.qoi")]
-    public void EncoderStandardImagesTest(string pngFileName, string qoiFileName)
+    [MemberData(nameof(GetReferenceImageCouples))]
+    public void EncoderStandardImagesTest(FileInfo pngFile, FileInfo qoiFile)
     {
         QoiFileAnalyzer analyzer = new();
 
         MemoryStream encodedImageStream = new();
-        Bitmap pngImage = new(Path.Combine("TestImages", pngFileName));
+        Bitmap pngImage = new(pngFile.FullName);
         QoiBitmapEncoder encoder = new();
         encoder.Write(pngImage, encodedImageStream);
 
         encodedImageStream.Position = 0;
-        var encodedImageInfo = analyzer.AnalyzeFile($"Encoded {pngFileName}",encodedImageStream);
+        var encodedImageInfo = analyzer.AnalyzeFile($"Encoded {pngFile.Name}", encodedImageStream);
         var strEncoded = encodedImageInfo.GetDebugString(false);
 
-        var referenceImageInfo = analyzer.AnalyzeFile(new FileInfo(Path.Combine("TestImages", qoiFileName)));
+        var referenceImageInfo = analyzer.AnalyzeFile(qoiFile);
         var strReference = referenceImageInfo.GetDebugString(false);
 
         Check.That(strEncoded).IsEqualTo(strReference);
+    }
+
+    public static IEnumerable<FileInfo[]> GetReferenceImageCouples()
+    {
+        var qoiFilesByName = TestImagesDirectory.EnumerateFiles("*.qoi")
+                                                .ToDictionary(f => Path.GetFileNameWithoutExtension(f.FullName));
+        var referencePngFiles = TestImagesDirectory.EnumerateFiles("*.png").ToArray();
+        foreach (var referencePngFile in referencePngFiles)
+        {
+            var referenceQoiFile = qoiFilesByName[Path.GetFileNameWithoutExtension(referencePngFile.FullName)];
+            yield return new[] { referencePngFile, referenceQoiFile };
+        }
     }
 
     [Theory]
@@ -76,18 +86,21 @@ public class IntegrationTest
         }
     }
 
-    public static IEnumerable<object[]> GetImageTestSet()
+    public static IEnumerable<Bitmap[]> GetImageTestSet()
     {
-        yield return new object[] { GetBlankImage() };
-        yield return new object[] { GetRandomArgbImage() };
-        yield return new object[] { GetMonochromeStripedImage() };
-        yield return new object[] { GetRandomStripedImage() };
-        yield return new object[] { GetRandomSimpleImage() };
-        yield return new object[] { GetShadedImage() };
-        yield return new object[] { GetShadedImage(3) };
-        yield return new object[] { new Bitmap(Path.Combine("TestImages", "testcard.png")) };
-        yield return new object[] { new Bitmap(Path.Combine("TestImages", "testcard_rgba.png")) };
-        yield return new object[] { new Bitmap(Path.Combine("TestImages", "dice.png")) };
+        yield return new[] { GetBlankImage() };
+        yield return new[] { GetRandomArgbImage() };
+        yield return new[] { GetMonochromeStripedImage() };
+        yield return new[] { GetRandomStripedImage() };
+        yield return new[] { GetRandomSimpleImage() };
+        yield return new[] { GetShadedImage() };
+        yield return new[] { GetShadedImage(3) };
+
+        FileInfo[] referencePngFiles = TestImagesDirectory.EnumerateFiles("*.png").ToArray();
+        foreach (var referencePngFile in referencePngFiles)
+        {
+            yield return new[] { new Bitmap(referencePngFile.FullName) };
+        }
     }
 
     private static Bitmap GetBlankImage(int width = 8, int height = 6) => new(width, height);
