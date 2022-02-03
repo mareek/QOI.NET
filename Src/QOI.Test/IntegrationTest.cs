@@ -1,7 +1,7 @@
 ﻿using System.Drawing;
 using NFluent;
 using QOI.Core.Debugging;
-using QOI.NET;
+using QOI.Gdi;
 using Xunit;
 
 namespace QOI.Test;

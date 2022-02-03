@@ -4,7 +4,7 @@ using System.Drawing.Imaging;
 using QOI.Core;
 using QOI.Core.Interface;
 
-namespace QOI.NET;
+namespace QOI.Gdi;
 
 internal class BitmapImageWriter : IImageWriter
 {

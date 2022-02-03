@@ -19,7 +19,7 @@
   </ItemGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\QOI.NET\QOI.NET.csproj" />
+    <ProjectReference Include="..\QOI.Gdi\QOI.Gdi.csproj" />
   </ItemGroup>
 
   <ItemGroup>

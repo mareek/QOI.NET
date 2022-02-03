@@ -6,7 +6,7 @@ using System.Linq;
 using QOI.Core;
 using static System.Drawing.Imaging.PixelFormat;
 
-namespace QOI.NET;
+namespace QOI.Gdi;
 
 public class QoiBitmapEncoder
 {

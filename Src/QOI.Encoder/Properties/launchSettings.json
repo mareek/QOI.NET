@@ -1,0 +1,8 @@
+{
+  "profiles": {
+    "QOI.Encoder": {
+      "commandName": "Project",
+      "commandLineArgs": "encode C:\\temp\\result.png"
+    }
+  }
+}

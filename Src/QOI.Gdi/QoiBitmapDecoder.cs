@@ -2,7 +2,7 @@
 using System.IO;
 using QOI.Core;
 
-namespace QOI.NET;
+namespace QOI.Gdi;
 
 public class QoiBitmapDecoder
 {
