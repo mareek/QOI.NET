@@ -43,12 +43,12 @@ public class IntegrationTest
 
         encodedImageStream.Position = 0;
         var encodedImageInfo = analyzer.AnalyzeFile($"Encoded {pngFile.Name}", encodedImageStream);
-        var strEncoded = encodedImageInfo.GetDebugString(false);
+        var encodedImageReport = encodedImageInfo.GetSummary(false);
 
         var referenceImageInfo = analyzer.AnalyzeFile(qoiFile);
-        var strReference = referenceImageInfo.GetDebugString(false);
+        var referenceImageReport = referenceImageInfo.GetSummary(false);
 
-        Check.That(strEncoded).IsEqualTo(strReference);
+        Check.That(encodedImageReport).IsEqualTo(referenceImageReport);
     }
 
     public static IEnumerable<FileInfo[]> GetReferenceImageCouples()

@@ -2,7 +2,7 @@
   "profiles": {
     "QOI.Encoder": {
       "commandName": "Project",
-      "commandLineArgs": "encode C:\\temp\\result.png"
+      "commandLineArgs": "analyze \"C:\\temp\\qoi test images\\testcard_rgba.qoi\""
     }
   }
 }

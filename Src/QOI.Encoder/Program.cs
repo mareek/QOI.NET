@@ -1,7 +1,8 @@
 ﻿using System.Drawing;
 using QOI.Core.Debugging;
-using QOI.Encoder;
 using QOI.Gdi;
+
+namespace QOI.Encoder;
 
 public class Program
 {
@@ -43,7 +44,7 @@ public class Program
     private static void AnalyzeImage(string imagePath)
     {
         var fileInfo = new QoiFileAnalyzer().AnalyzeFile(new FileInfo(imagePath));
-        Console.WriteLine(fileInfo.GetDebugString());
+        Console.WriteLine(fileInfo.GetSummary());
     }
 
     private static void EncodeImage(string sourceFilePath, string destFilePath)
