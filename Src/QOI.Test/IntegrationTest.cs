@@ -6,10 +6,8 @@ using Xunit;
 
 namespace QOI.Test;
 
-public class IntegrationTest
+public class IntegrationTest : IntegrationTestBase
 {
-    private static DirectoryInfo TestImagesDirectory => new("TestImages");
-
     [Theory]
     [MemberData(nameof(GetReferenceImageCouples))]
     public void DecoderStandardImagesTest(FileInfo pngFile, FileInfo qoiFile)
@@ -49,18 +47,6 @@ public class IntegrationTest
         var referenceImageReport = referenceImageInfo.GetSummary(false);
 
         Check.That(encodedImageReport).IsEqualTo(referenceImageReport);
-    }
-
-    public static IEnumerable<FileInfo[]> GetReferenceImageCouples()
-    {
-        var qoiFilesByName = TestImagesDirectory.EnumerateFiles("*.qoi")
-                                                .ToDictionary(f => Path.GetFileNameWithoutExtension(f.FullName));
-        var referencePngFiles = TestImagesDirectory.EnumerateFiles("*.png").ToArray();
-        foreach (var referencePngFile in referencePngFiles)
-        {
-            var referenceQoiFile = qoiFilesByName[Path.GetFileNameWithoutExtension(referencePngFile.FullName)];
-            yield return new[] { referencePngFile, referenceQoiFile };
-        }
     }
 
     [Theory]

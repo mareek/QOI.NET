@@ -13,6 +13,8 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "QOI.Core", "QOI.Core\QOI.Co
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "QOI.Encoder", "QOI.Encoder\QOI.Encoder.csproj", "{ACECF379-0707-4AC1-9158-FCCE744A7376}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "QOI.ImageSharp", "QOI.ImageSharp\QOI.ImageSharp.csproj", "{618C45FF-F22E-4A65-962D-814E659E6C14}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -39,6 +41,10 @@ Global
 		{ACECF379-0707-4AC1-9158-FCCE744A7376}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{ACECF379-0707-4AC1-9158-FCCE744A7376}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{ACECF379-0707-4AC1-9158-FCCE744A7376}.Release|Any CPU.Build.0 = Release|Any CPU
+		{618C45FF-F22E-4A65-962D-814E659E6C14}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{618C45FF-F22E-4A65-962D-814E659E6C14}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{618C45FF-F22E-4A65-962D-814E659E6C14}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{618C45FF-F22E-4A65-962D-814E659E6C14}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
