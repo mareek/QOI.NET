@@ -15,6 +15,8 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "QOI.Encoder", "QOI.Encoder\
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "QOI.ImageSharp", "QOI.ImageSharp\QOI.ImageSharp.csproj", "{618C45FF-F22E-4A65-962D-814E659E6C14}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "QOI.Bench", "QOI.Bench\QOI.Bench.csproj", "{439E78E5-B88A-4060-8D44-C15F6D7AF5DD}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -45,6 +47,10 @@ Global
 		{618C45FF-F22E-4A65-962D-814E659E6C14}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{618C45FF-F22E-4A65-962D-814E659E6C14}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{618C45FF-F22E-4A65-962D-814E659E6C14}.Release|Any CPU.Build.0 = Release|Any CPU
+		{439E78E5-B88A-4060-8D44-C15F6D7AF5DD}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{439E78E5-B88A-4060-8D44-C15F6D7AF5DD}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{439E78E5-B88A-4060-8D44-C15F6D7AF5DD}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{439E78E5-B88A-4060-8D44-C15F6D7AF5DD}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

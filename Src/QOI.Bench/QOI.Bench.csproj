@@ -1,0 +1,71 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <OutputType>Exe</OutputType>
+    <TargetFramework>net6.0</TargetFramework>
+    <ImplicitUsings>enable</ImplicitUsings>
+    <Nullable>enable</Nullable>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <Content Include="..\QOI.Test\TestImages\dice.png" Link="TestImages\dice.png">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="..\QOI.Test\TestImages\kodim10.png" Link="TestImages\kodim10.png">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="..\QOI.Test\TestImages\kodim23.png" Link="TestImages\kodim23.png">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="..\QOI.Test\TestImages\qoi_logo.png" Link="TestImages\qoi_logo.png">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="..\QOI.Test\TestImages\testcard.png" Link="TestImages\testcard.png">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="..\QOI.Test\TestImages\testcard_rgba.png" Link="TestImages\testcard_rgba.png">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="..\QOI.Test\TestImages\wikipedia_008.png" Link="TestImages\wikipedia_008.png">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+  </ItemGroup>
+
+  <ItemGroup>
+    <Folder Include="TestImages\" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <None Include="..\QOI.Test\TestImages\dice.qoi" Link="TestImages\dice.qoi">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+    <None Include="..\QOI.Test\TestImages\kodim10.qoi" Link="TestImages\kodim10.qoi">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+    <None Include="..\QOI.Test\TestImages\kodim23.qoi" Link="TestImages\kodim23.qoi">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+    <None Include="..\QOI.Test\TestImages\qoi_logo.qoi" Link="TestImages\qoi_logo.qoi">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+    <None Include="..\QOI.Test\TestImages\testcard.qoi" Link="TestImages\testcard.qoi">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+    <None Include="..\QOI.Test\TestImages\testcard_rgba.qoi" Link="TestImages\testcard_rgba.qoi">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+    <None Include="..\QOI.Test\TestImages\wikipedia_008.qoi" Link="TestImages\wikipedia_008.qoi">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+  </ItemGroup>
+
+  <ItemGroup>
+    <PackageReference Include="BenchmarkDotNet" Version="0.13.1" />
+    <PackageReference Include="System.Drawing.Common" Version="6.0.0" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\QOI.Core\QOI.Core.csproj" />
+  </ItemGroup>
+
+</Project>
