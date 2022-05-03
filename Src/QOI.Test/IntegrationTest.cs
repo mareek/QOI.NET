@@ -43,7 +43,7 @@ public class IntegrationTest : IntegrationTestBase
         var encodedImageInfo = analyzer.AnalyzeFile($"Encoded {pngFile.Name}", encodedImageStream);
         var encodedImageReport = encodedImageInfo.GetSummary(false);
 
-        var referenceImageInfo = analyzer.AnalyzeFile(qoiFile);
+        var referenceImageInfo = analyzer.AnalyzeFile(qoiFile.FullName);
         var referenceImageReport = referenceImageInfo.GetSummary(false);
 
         Check.That(encodedImageReport).IsEqualTo(referenceImageReport);

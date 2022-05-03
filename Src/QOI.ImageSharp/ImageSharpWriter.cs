@@ -23,8 +23,8 @@ internal class ImageSharpWriter : IImageWriter
         if (_image == null) throw new ArgumentNullException("Image has not been initialized");
 
         int width = _image.Width;
-        var x = _currentIndex % width;
-        var y = _currentIndex / width;
+        int x = _currentIndex % width;
+        int y = _currentIndex / width;
 
         _image.GetPixelRowSpan(y)[x] = new Rgba32(color.R, color.G, color.B, color.A);
         _currentIndex++;

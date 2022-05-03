@@ -8,7 +8,11 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\QOI.Gdi\QOI.Gdi.csproj" />
+    <PackageReference Include="SixLabors.ImageSharp" Version="2.1.1" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\QOI.ImageSharp\QOI.ImageSharp.csproj" />
   </ItemGroup>
 
 </Project>

@@ -8,10 +8,10 @@ namespace QOI.Core.Debugging;
 
 public class QoiFileAnalyzer
 {
-    public QoiFileInfo AnalyzeFile(FileInfo file)
+    public QoiFileInfo AnalyzeFile(string filePath)
     {
-        using var fileStream = file.OpenRead();
-        return AnalyzeFile(file.Name, fileStream);
+        using var fileStream = File.OpenRead(filePath);
+        return AnalyzeFile(Path.GetFileName(filePath), fileStream);
     }
 
     public QoiFileInfo AnalyzeFile(string fileName, Stream fileStream)
