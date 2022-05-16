@@ -1,9 +1,21 @@
-<Project Sdk="Microsoft.NET.Sdk">
+﻿<Project Sdk="Microsoft.NET.Sdk">
 
   <PropertyGroup>
     <TargetFramework>netstandard2.1</TargetFramework>
     <Nullable>enable</Nullable>
 	<LangVersion>10</LangVersion>
+  </PropertyGroup>
+
+  <PropertyGroup>
+	<Version>1.0.0</Version>
+    <Authors>Matthieu Mourisson</Authors>
+    <PackageId>QOI.Core</PackageId>
+    <PackageLicenseExpression>WTFPL</PackageLicenseExpression>
+    <PackageTags>QOI;Image;Encoding;Decoding</PackageTags>
+    <RepositoryUrl>https://github.com/mareek/QOI.NET</RepositoryUrl>
+    <RepositoryType>git</RepositoryType>
+    <Description>A base library to provide QOI Image encoding/decoding to other librairies</Description>
+    <GeneratePackageOnBuild>true</GeneratePackageOnBuild>
   </PropertyGroup>
 
 </Project>
