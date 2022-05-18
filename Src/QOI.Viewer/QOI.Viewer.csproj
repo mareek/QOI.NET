@@ -13,6 +13,7 @@
 
   <ItemGroup>
     <ProjectReference Include="..\QOI.Core\QOI.Core.csproj" />
+    <ProjectReference Include="..\QOI.Wpf\QOI.Wpf.csproj" />
   </ItemGroup>
 
 </Project>

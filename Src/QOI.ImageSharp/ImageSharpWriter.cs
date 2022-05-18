@@ -20,7 +20,7 @@ internal class ImageSharpWriter : IImageWriter
 
     public void WritePixel(QoiColor color)
     {
-        if (_image == null) throw new ArgumentNullException("Image has not been initialized");
+        if (_image == null) throw new InvalidOperationException("Image has not been initialized");
 
         int width = _image.Width;
         int x = _currentIndex % width;
@@ -32,7 +32,7 @@ internal class ImageSharpWriter : IImageWriter
 
     public Image<Rgba32> GetImage()
     {
-        return _image ?? throw new ArgumentNullException("Image has not been initialized");
+        return _image ?? throw new InvalidOperationException("Image has not been initialized");
     }
 
 }

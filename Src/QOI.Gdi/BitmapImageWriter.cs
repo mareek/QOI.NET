@@ -20,7 +20,7 @@ internal class BitmapImageWriter : IImageWriter
 
     public void WritePixel(QoiColor color)
     {
-        if (_bitmap == null) throw new ArgumentNullException("Image has not been initialized");
+        if (_bitmap == null) throw new InvalidOperationException("Image has not been initialized");
 
         int width = _bitmap.Width;
         var x = _currentIndex % width;
@@ -32,7 +32,7 @@ internal class BitmapImageWriter : IImageWriter
 
     public Bitmap GetImage()
     {
-        if (_bitmap == null) throw new ArgumentNullException("Image has not been initialized");
+        if (_bitmap == null) throw new InvalidOperationException("Image has not been initialized");
         return _bitmap;
     }
 }
