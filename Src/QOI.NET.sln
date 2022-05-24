@@ -19,6 +19,10 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "QOI.Bench", "QOI.Bench\QOI.
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "QOI.Wpf", "QOI.Wpf\QOI.Wpf.csproj", "{4DDCF8F1-B574-4064-8E2B-A352B60F47E2}"
 EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Tests", "Tests", "{45FC6CA0-CC62-48CA-BFF7-1C74AB963F01}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "QOI.Core.Test", "QOI.Core.Test\QOI.Core.Test.csproj", "{D46211D1-6A9C-4966-91ED-BD4800E85725}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -57,9 +61,17 @@ Global
 		{4DDCF8F1-B574-4064-8E2B-A352B60F47E2}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{4DDCF8F1-B574-4064-8E2B-A352B60F47E2}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{4DDCF8F1-B574-4064-8E2B-A352B60F47E2}.Release|Any CPU.Build.0 = Release|Any CPU
+		{D46211D1-6A9C-4966-91ED-BD4800E85725}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{D46211D1-6A9C-4966-91ED-BD4800E85725}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{D46211D1-6A9C-4966-91ED-BD4800E85725}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{D46211D1-6A9C-4966-91ED-BD4800E85725}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(NestedProjects) = preSolution
+		{2DCED9ED-2833-4CD7-BAB6-4C325E8917E9} = {45FC6CA0-CC62-48CA-BFF7-1C74AB963F01}
+		{D46211D1-6A9C-4966-91ED-BD4800E85725} = {45FC6CA0-CC62-48CA-BFF7-1C74AB963F01}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {983C73FA-4486-4777-A8E3-DC0056B15F78}
