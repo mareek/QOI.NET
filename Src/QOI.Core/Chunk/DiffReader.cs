@@ -1,20 +1,17 @@
 ﻿using System;
-using QOI.Core.Interface;
 
 namespace QOI.Core.Chunk;
 
-internal class DiffReader : IChunkReader
+internal class DiffReader : ISinglePixelChunkReader
 {
     private const short MinDiff = -2;
 
     public int ChunkLength => 1;
 
-    public QoiColor WritePixels(IImageWriter imageWriter, ReadOnlySpan<byte> chunk, QoiColor previousPixel)
+    public QoiColor ReadPixel(ReadOnlySpan<byte> chunk, QoiColor previousPixel)
     {
         var diff = ParseDiff(chunk[0]);
-        var pixel = diff.GetPixel(previousPixel);
-        imageWriter.WritePixel(pixel);
-        return pixel;
+        return diff.GetPixel(previousPixel);
     }
 
     private QoiColorDiff ParseDiff(byte chunk)

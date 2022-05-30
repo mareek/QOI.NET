@@ -1,7 +1,6 @@
 ﻿using System;
 using System.IO;
 using QOI.Core.Chunk;
-using QOI.Core.Interface;
 
 namespace QOI.Core;
 
@@ -22,19 +21,24 @@ public class QoiDecoder
         return firstBytes.SequenceEqual(HeaderHelper.MagicBytes);
     }
 
-    public void Read(Stream stream, IImageWriter imageWriter)
+    public QoiImage Read(Stream stream)
     {
         var (width, height, hasAlpha, isSrgb) = HeaderHelper.ReadHeader(stream);
 
-        imageWriter.Init(width, height, hasAlpha, isSrgb);
-        DecodePixels(stream, imageWriter);
+        var pixels = DecodePixels(stream, width * height);
+
+        return new QoiImage(width, height, hasAlpha, isSrgb, pixels);
     }
 
-    private void DecodePixels(Stream stream, IImageWriter imageWriter)
+    private QoiColor[] DecodePixels(Stream stream, uint pixelCount)
     {
         Span<byte> chunkBuffer = stackalloc byte[5];
+
+        var result = new QoiColor[pixelCount];
         var previousPixel = QoiColor.FromArgb(255, 0, 0, 0);
-        while (!imageWriter.IsComplete)
+
+        int pixelIndex = 0;
+        while (pixelIndex < pixelCount)
         {
             stream.Read(chunkBuffer[0..1]);
             var chunkReader = ChunkReaderSelector(chunkBuffer[0]);
@@ -42,11 +46,27 @@ public class QoiDecoder
             {
                 stream.Read(chunkBuffer[1..chunkReader.ChunkLength]);
             }
+            Span<byte> chunk = chunkBuffer[0..chunkReader.ChunkLength];
 
-            previousPixel = chunkReader.WritePixels(imageWriter, chunkBuffer[0..chunkReader.ChunkLength], previousPixel);
+            if (chunkReader is ISinglePixelChunkReader singlePixelReader)
+            {
+                previousPixel = singlePixelReader.ReadPixel(chunk, previousPixel);
+                result[pixelIndex++] = previousPixel;
+                _indexReader.AddToIndex(previousPixel);
+            }
+            else if (chunkReader is RunReader runReader)
+            {
+                int runLength = runReader.GetRunLength(chunk);
+                result.AsSpan(pixelIndex, runLength)
+                      .Fill(previousPixel);
+                pixelIndex += runLength;
+            }
+            else 
+                throw new NotSupportedException($"Unknown chunk reader: {chunkReader.GetType().Name}");
 
-            _indexReader.AddToIndex(previousPixel);
         }
+
+        return result;
     }
 
     private IChunkReader ChunkReaderSelector(byte tagByte)

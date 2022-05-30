@@ -1,18 +1,15 @@
 ﻿using System;
-using QOI.Core.Interface;
 
 namespace QOI.Core.Chunk;
 
-internal class LumaReader : IChunkReader
+internal class LumaReader : ISinglePixelChunkReader
 {
     public int ChunkLength => 2;
 
-    public QoiColor WritePixels(IImageWriter imageWriter, ReadOnlySpan<byte> chunk, QoiColor previousPixel)
+    public QoiColor ReadPixel(ReadOnlySpan<byte> chunk, QoiColor previousPixel)
     {
         QoiColorDiff diff = ReadDiff(chunk);
-        var pixel = diff.GetPixel(previousPixel);
-        imageWriter.WritePixel(pixel);
-        return pixel;
+        return diff.GetPixel(previousPixel);
     }
 
     private QoiColorDiff ReadDiff(ReadOnlySpan<byte> chunk)

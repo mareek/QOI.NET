@@ -1,9 +1,8 @@
 ﻿using System;
-using QOI.Core.Interface;
 
 namespace QOI.Core.Chunk;
 
-internal class IndexReader : IChunkReader
+internal class IndexReader : ISinglePixelChunkReader
 {
     private readonly PixelIndex _pixelIndex = new();
 
@@ -11,10 +10,5 @@ internal class IndexReader : IChunkReader
 
     public int ChunkLength => 1;
 
-    public QoiColor WritePixels(IImageWriter imageWriter, ReadOnlySpan<byte> chunk, QoiColor previousPixel)
-    {
-        var pixel = _pixelIndex.Get(chunk[0]);
-        imageWriter.WritePixel(pixel);
-        return pixel;
-    }
+    public QoiColor ReadPixel(ReadOnlySpan<byte> chunk, QoiColor previousPixel) => _pixelIndex.Get(chunk[0]);
 }

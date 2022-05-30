@@ -7,79 +7,86 @@ namespace QOI.Bench;
 
 public class QoiBench
 {
-    private readonly byte[] _kodim23QoiImageData;
-    private readonly byte[] _diceQoiImageData;
-    private readonly byte[] _qoilogoQoiImageData;
-    private readonly byte[] _kodim23PngImageData;
-    private readonly byte[] _dicePngImageData;
-    private readonly byte[] _qoilogoPngImageData;
+    private readonly BenchHelper _diceBenchHelper = new(@"TestImages\dice");
+    private readonly BenchHelper _kodim23BenchHelper = new(@"TestImages\kodim23");
+    private readonly BenchHelper _qoiLogoBenchHelper = new(@"TestImages\qoi_logo");
 
-    private readonly Bitmap _kodim23PngImage;
-    private readonly Bitmap _dicePngImage;
-    private readonly Bitmap _qoilogoPngImage;
-    private readonly (uint width, uint height, QoiColor[] pixels) _kodim23PngImageInfo;
-    private readonly (uint width, uint height, QoiColor[] pixels) _dicePngImageInfo;
-    private readonly (uint width, uint height, QoiColor[] pixels) _qoilogoPngImageInfo;
 
-    public QoiBench()
+    [Benchmark]
+    public void DecodeKodim23QoiImage() => _kodim23BenchHelper.DecodeQoi();
+
+    [Benchmark]
+    public void DecodeDiceQoiImage() => _diceBenchHelper.DecodeQoi();
+
+    [Benchmark]
+    public void DecodeQoiLogoImage() => _qoiLogoBenchHelper.DecodeQoi();
+
+    [Benchmark]
+    public void DecodeKodim23PngImage() => _kodim23BenchHelper.DecodePng();
+
+    [Benchmark]
+    public void DecodeDicePngImage() => _diceBenchHelper.DecodePng();
+
+    [Benchmark]
+    public void DecodeQoiLogoPngImage() => _qoiLogoBenchHelper.DecodePng();
+
+    [Benchmark]
+    public void EncodeKodim23Image() => _kodim23BenchHelper.EncodeImageToQoi();
+
+    [Benchmark]
+    public void EncodeDiceImage() => _diceBenchHelper.EncodeImageToQoi();
+
+    [Benchmark]
+    public void EncodeQoiLogoImage() => _qoiLogoBenchHelper.EncodeImageToQoi();
+
+    [Benchmark]
+    public void EncodeKodim23PngImage() => _kodim23BenchHelper.EncodeImageToPng();
+
+    [Benchmark]
+    public void EncodeDicePngImage() => _diceBenchHelper.EncodeImageToPng();
+
+    [Benchmark]
+    public void EncodeQoiLogoPngImage() => _qoiLogoBenchHelper.EncodeImageToPng();
+
+    public class BenchHelper
     {
-        _kodim23QoiImageData = File.ReadAllBytes(@"TestImages\kodim23.qoi");
-        _diceQoiImageData = File.ReadAllBytes(@"TestImages\dice.qoi");
-        _qoilogoQoiImageData = File.ReadAllBytes(@"TestImages\qoi_logo.qoi");
+        private readonly QoiDecoder _qoiDecoder = new();
+        private readonly QoiEncoder _qoiEncoder = new();
 
-        _kodim23PngImageData = File.ReadAllBytes(@"TestImages\kodim23.png");
-        _dicePngImageData = File.ReadAllBytes(@"TestImages\dice.png");
-        _qoilogoPngImageData = File.ReadAllBytes(@"TestImages\qoi_logo.png");
+        public BenchHelper(string baseImagePath)
+        {
+            QoiImageData = File.ReadAllBytes(baseImagePath + ".qoi");
+            PngImageData = File.ReadAllBytes(baseImagePath + ".png");
 
-        _kodim23PngImage = new Bitmap(new MemoryStream(_kodim23PngImageData));
-        _dicePngImage = new Bitmap(new MemoryStream(_dicePngImageData));
-        _qoilogoPngImage = new Bitmap(new MemoryStream(_qoilogoPngImageData));
+            BitmapImage = new Bitmap(new MemoryStream(PngImageData));
 
-        _kodim23PngImageInfo = RawEncoder.GetImageData(_kodim23PngImage);
-        _dicePngImageInfo = RawEncoder.GetImageData(_dicePngImage);
-        _qoilogoPngImageInfo = RawEncoder.GetImageData(_qoilogoPngImage);
+            Width = (uint)BitmapImage.Width;
+            Height = (uint)BitmapImage.Height; ;
+
+            Pixels = new QoiColor[BitmapImage.Width * BitmapImage.Height];
+            for (int y = 0; y < BitmapImage.Height; y++)
+                for (int x = 0; x < BitmapImage.Width; x++)
+                {
+                    var color = BitmapImage.GetPixel(x, y);
+                    Pixels[y * BitmapImage.Width + x] = QoiColor.FromArgb(color.A, color.R, color.G, color.B);
+                }
+
+        }
+
+        public byte[] QoiImageData { get; }
+        public byte[] PngImageData { get; }
+        public Bitmap BitmapImage { get; }
+        public uint Width { get; }
+        public uint Height { get; }
+        public QoiColor[] Pixels { get; }
+
+        public void EncodeImageToPng() => BitmapImage.Save(new ForgetStream(), ImageFormat.Png);
+
+        public void EncodeImageToQoi() => _qoiEncoder.Write(Width, Height, true, true, Pixels, new ForgetStream());
+
+        public void DecodeQoi() => _qoiDecoder.Read(new MemoryStream(QoiImageData));
+
+        public void DecodePng() => Image.FromStream(new MemoryStream(PngImageData));
+
     }
-
-    private readonly RawEncoder _rawEncoder = new();
-    private readonly RawDecoder _rawDecoder = new();
-
-    [Benchmark]
-    public void DecodeKodim23Image() => _rawDecoder.Read(_kodim23QoiImageData);
-
-    [Benchmark]
-    public void DecodeDiceImage() => _rawDecoder.Read(_diceQoiImageData);
-
-    [Benchmark]
-    public void DecodeQoiLogoImage() => _rawDecoder.Read(_qoilogoQoiImageData);
-
-    [Benchmark]
-    public void DecodeKodim23PngImage() => Image.FromStream(new MemoryStream(_kodim23PngImageData));
-
-    [Benchmark]
-    public void DecodeDicePngImage() => Image.FromStream(new MemoryStream(_dicePngImageData));
-
-    [Benchmark]
-    public void DecodeQoiLogoPngImage() => Image.FromStream(new MemoryStream(_qoilogoPngImageData));
-
-
-    [Benchmark]
-    public void EncodeKodim23Image()
-        => _rawEncoder.Encode(_kodim23PngImageInfo.width, _kodim23PngImageInfo.height, _kodim23PngImageInfo.pixels);
-
-    [Benchmark]
-    public void EncodeDiceImage()
-        => _rawEncoder.Encode(_dicePngImageInfo.width, _dicePngImageInfo.height, _dicePngImageInfo.pixels);
-
-    [Benchmark]
-    public void EncodeQoiLogoImage()
-        => _rawEncoder.Encode(_qoilogoPngImageInfo.width, _qoilogoPngImageInfo.height, _qoilogoPngImageInfo.pixels);
-
-    [Benchmark]
-    public void EncodeKodim23PngImage() => _kodim23PngImage.Save(new ForgetStream(), ImageFormat.Png);
-
-    [Benchmark]
-    public void EncodeDicePngImage() => _dicePngImage.Save(new ForgetStream(), ImageFormat.Png);
-
-    [Benchmark]
-    public void EncodeQoiLogoPngImage() => _qoilogoPngImage.Save(new ForgetStream(), ImageFormat.Png);
 }
