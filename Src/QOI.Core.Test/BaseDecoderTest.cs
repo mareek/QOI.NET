@@ -24,4 +24,14 @@ public class BaseDecoderTest
         using MemoryStream stream = new(imageData);
         Check.That(QoiDecoder.IsQoiImage(stream)).IsEqualTo(isValid);
     }
+
+    /*
+    TODO:
+    - MAJ les projet pour être conformes à la nouvelle architecture
+    - MAJ le package nuget QOI.Core en le passant en 2.0.0 (breaking change)
+    - Mettre les autres projets sur nuget
+    - rapatrier des tests ici
+    - réfléchir si on peut faire un rendre le decoder streamable (sans alouer un gros tableau)
+    - profiler le code pour voir s'il y a des gains de perfs facilement atteignables
+     */
 }

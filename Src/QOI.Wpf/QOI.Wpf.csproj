@@ -9,7 +9,7 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <PackageReference Include="QOI.Core" Version="1.0.0" />
+    <ProjectReference Include="..\QOI.Core\QOI.Core.csproj" />
   </ItemGroup>
 
 </Project>

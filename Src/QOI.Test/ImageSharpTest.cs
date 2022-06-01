@@ -13,10 +13,21 @@ public class ImageSharpTest : IntegrationTestBase
     [MemberData(nameof(GetReferenceImageCouples))]
     public void DecoderImageSharpStandardImagesTest(FileInfo pngFile, FileInfo qoiFile)
     {
-        var referenceImage = Image.Load<Rgba32>(pngFile.FullName);
+        var imageInfo = Image.Identify(pngFile.FullName);
+        if (imageInfo.PixelType.BitsPerPixel == 24)
+            CompareOriginalToDecoded<Rgb24>(pngFile, qoiFile);
+        else
+            CompareOriginalToDecoded<Rgba32>(pngFile, qoiFile);
+    }
+
+    private void CompareOriginalToDecoded<TPixel>(FileInfo pngFile, FileInfo qoiFile)
+        where TPixel : unmanaged, IPixel<TPixel>
+    {
+
+        var referenceImage = Image.Load<TPixel>(pngFile.FullName);
 
         QoiImageSharpDecoder decoder = new();
-        var qoiImage = decoder.Read(qoiFile.FullName);
+        var qoiImage = (Image<TPixel>)decoder.Read(qoiFile.FullName);
 
         for (int y = 0; y < referenceImage.Height; y++)
         {
