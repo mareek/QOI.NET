@@ -20,7 +20,7 @@ public class ImageSharpTest : IntegrationTestBase
             CompareOriginalToDecoded<Rgba32>(pngFile, qoiFile);
     }
 
-    private void CompareOriginalToDecoded<TPixel>(FileInfo pngFile, FileInfo qoiFile)
+    private static void CompareOriginalToDecoded<TPixel>(FileInfo pngFile, FileInfo qoiFile)
         where TPixel : unmanaged, IPixel<TPixel>
     {
 
