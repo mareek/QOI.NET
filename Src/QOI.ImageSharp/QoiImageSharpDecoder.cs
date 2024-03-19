@@ -33,11 +33,10 @@ public class QoiImageSharpDecoder
 
         for (int y = 0; y < qoiImage.Height; y++)
         {
-            Span<TPixel> rowSpan = image.GetPixelRowSpan(y);
             for (int x = 0; x < qoiImage.Width; x++)
             {
                 var pixelIndex = y * qoiImage.Width + x;
-                rowSpan[x] = pixelConverter(qoiImage.Pixels[pixelIndex]);
+                image[x,y] = pixelConverter(qoiImage.Pixels[pixelIndex]);
             }
         }
 

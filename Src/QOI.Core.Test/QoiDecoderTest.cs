@@ -5,28 +5,38 @@ namespace QOI.Core.Test;
 
 public class QoiDecoderTest
 {
-    public static object[][] GetFileValidityTestSet()
-        => new object[][]
-        {
-            new object[] { false, Array.Empty<byte>() },
-            new object[] { false, new byte[] { 0, 0, 0, 0, 0, 0 } },
-            new object[] { false, new byte[] { 255, 38, 252, 55, 127, 0, 0, 0 } },
-            new object[] { false, new byte[] { 0x71, 0x6F } },
-            new object[] { false, new byte[] { 0x71, 0x6F, 0x69, 0xFF, 0x12 } },
-            new object[] { true, new byte[] { 0x71, 0x6F, 0x69, 0x66 } },
-            new object[] { true, new byte[] { 0x71, 0x6F, 0x69, 0x66, 1, 2, 3, 4 } },
-        };
+    public static object[][] FileValidityTestSet = new object[][]
+    {
+        new object[] { false, Array.Empty<byte>() },
+        new object[] { false, new byte[] { 0, 0, 0, 0, 0, 0 } },
+        new object[] { false, new byte[] { 255, 38, 252, 55, 127, 0, 0, 0 } },
+        new object[] { false, new byte[] { 0x71, 0x6F } },
+        new object[] { false, new byte[] { 0x71, 0x6F, 0x69, 0xFF, 0x12 } },
+        new object[] { true, new byte[] { 0x71, 0x6F, 0x69, 0x66 } },
+        new object[] { true, new byte[] { 0x71, 0x6F, 0x69, 0x66, 1, 2, 3, 4 } },
+    };
 
     [Theory]
-    [MemberData(nameof(GetFileValidityTestSet))]
+    [MemberData(nameof(FileValidityTestSet))]
     public void InvalidImages(bool isValid, params byte[] imageData)
     {
         using MemoryStream stream = new(imageData);
         Check.That(QoiDecoder.IsQoiImage(stream)).IsEqualTo(isValid);
     }
 
+    public static object[][] ImageTestSet = new object[][]
+    {
+        new object[] { GetBlankImage() },
+        new object[] { GetRandomArgbImage() },
+        new object[] { GetMonochromeStripedImage() },
+        new object[] { GetRandomStripedImage() },
+        new object[] { GetRandomSimpleImage() },
+        new object[] { GetShadedImage() },
+        new object[] { GetShadedImage(3) },
+    };
+
     [Theory]
-    [MemberData(nameof(GetImageTestSet))]
+    [MemberData(nameof(ImageTestSet))]
     public void FullCircleProcessTest(QoiImage imgTest)
     {
         using var stream = new MemoryStream();
@@ -49,17 +59,6 @@ public class QoiDecoderTest
             var pixelDest = decodedImage.Pixels[pixelIndex];
             Check.That(pixelDest).IsEqualTo(pixelSrc);
         }
-    }
-
-    public static IEnumerable<QoiImage[]> GetImageTestSet()
-    {
-        yield return new[] { GetBlankImage() };
-        yield return new[] { GetRandomArgbImage() };
-        yield return new[] { GetMonochromeStripedImage() };
-        yield return new[] { GetRandomStripedImage() };
-        yield return new[] { GetRandomSimpleImage() };
-        yield return new[] { GetShadedImage() };
-        yield return new[] { GetShadedImage(3) };
     }
 
     private static QoiImage GetBlankImage(int width = 8, int height = 6)

@@ -14,7 +14,7 @@
     <PackageTags>QOI;Image;Encoding;Decoding</PackageTags>
     <RepositoryUrl>https://github.com/mareek/QOI.NET</RepositoryUrl>
     <RepositoryType>git</RepositoryType>
-    <Description>A base library to provide QOI Image encoding/decoding to other librairies</Description>
+    <Description>A library to provide basic QOI Image encoding/decoding. see https://qoiformat.org/</Description>
     <GeneratePackageOnBuild>true</GeneratePackageOnBuild>
   </PropertyGroup>
 
