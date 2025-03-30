@@ -4,7 +4,7 @@
     {
         protected static DirectoryInfo TestImagesDirectory => new("TestImages");
 
-        public static IEnumerable<FileInfo[]> GetReferenceImageCouples()
+        public static IEnumerable<object[]> GetReferenceImageCouples()
         {
             var qoiFilesByName = TestImagesDirectory.EnumerateFiles("*.qoi")
                                                     .ToDictionary(f => Path.GetFileNameWithoutExtension(f.FullName));
