@@ -17,7 +17,7 @@ namespace QOI.Viewer;
 /// </summary>
 public partial class MainWindow : Window
 {
-    private static readonly string[] SupportedExtensions = { "qoi", "png", "jpg", "jpeg", "bmp" };
+    private static readonly string[] SupportedExtensions = ["qoi", "png", "jpg", "jpeg", "bmp"];
 
     private readonly QoiBitmapSourceDecoder _imageDecoder = new();
     private readonly SimpleCache<ImageSource> _imageCache = new(10);
@@ -135,7 +135,6 @@ public partial class MainWindow : Window
         var firstIndex = Math.Max(currentIndex - 3, 0);
         var lastIndex = Math.Min(currentIndex + 3, currentDirSupportedFiles.Count - 1);
 
-        List<ImageSource> thumbnails = new();
         for (int i = firstIndex; i <= lastIndex; i++)
         {
             yield return new FileInfo(currentDirSupportedFiles[i]);
@@ -159,7 +158,7 @@ public partial class MainWindow : Window
             : LoadNonQoiImage(fileContent);
     }
 
-    private static ImageSource LoadNonQoiImage(Stream fileStream)
+    private static BitmapImage LoadNonQoiImage(Stream fileStream)
     {
         BitmapImage bmpSource = new();
 

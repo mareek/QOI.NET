@@ -10,12 +10,12 @@ public class IntegrationTest : IntegrationTestBase
 {
     [Theory]
     [MemberData(nameof(GetReferenceImageCouples))]
-    public void DecoderStandardImagesTest(FileInfo pngFile, FileInfo qoiFile)
+    public void DecoderStandardImagesTest(string pngFilePath, string qoiFilePath)
     {
-        var referenceImage = new Bitmap(pngFile.FullName);
+        var referenceImage = new Bitmap(pngFilePath);
 
         QoiBitmapDecoder decoder = new();
-        var qoiImage = decoder.Read(qoiFile.FullName);
+        var qoiImage = decoder.Read(qoiFilePath);
 
         for (int y = 0; y < referenceImage.Height; y++)
         {
@@ -30,20 +30,20 @@ public class IntegrationTest : IntegrationTestBase
 
     [Theory]
     [MemberData(nameof(GetReferenceImageCouples))]
-    public void EncoderStandardImagesTest(FileInfo pngFile, FileInfo qoiFile)
+    public void EncoderStandardImagesTest(string pngFilePath, string qoiFilePath)
     {
         QoiFileAnalyzer analyzer = new();
 
         MemoryStream encodedImageStream = new();
-        Bitmap pngImage = new(pngFile.FullName);
+        Bitmap pngImage = new(pngFilePath);
         QoiBitmapEncoder encoder = new();
         encoder.Write(pngImage, encodedImageStream);
 
         encodedImageStream.Position = 0;
-        var encodedImageInfo = analyzer.AnalyzeFile($"Encoded {pngFile.Name}", encodedImageStream);
+        var encodedImageInfo = analyzer.AnalyzeFile($"Encoded {Path.GetFileName(pngFilePath)}", encodedImageStream);
         var encodedImageReport = encodedImageInfo.GetSummary(false);
 
-        var referenceImageInfo = analyzer.AnalyzeFile(qoiFile.FullName);
+        var referenceImageInfo = analyzer.AnalyzeFile(qoiFilePath);
         var referenceImageReport = referenceImageInfo.GetSummary(false);
 
         Check.That(encodedImageReport).IsEqualTo(referenceImageReport);

@@ -2,7 +2,7 @@
 
 namespace QOI.Core;
 
-public struct QoiColor : IEquatable<QoiColor>
+public readonly struct QoiColor : IEquatable<QoiColor>
 {
     public byte R { get; }
     public byte G { get; }

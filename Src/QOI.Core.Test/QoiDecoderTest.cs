@@ -5,16 +5,17 @@ namespace QOI.Core.Test;
 
 public class QoiDecoderTest
 {
-    public static object[][] FileValidityTestSet = new object[][]
-    {
-        new object[] { false, Array.Empty<byte>() },
-        new object[] { false, new byte[] { 0, 0, 0, 0, 0, 0 } },
-        new object[] { false, new byte[] { 255, 38, 252, 55, 127, 0, 0, 0 } },
-        new object[] { false, new byte[] { 0x71, 0x6F } },
-        new object[] { false, new byte[] { 0x71, 0x6F, 0x69, 0xFF, 0x12 } },
-        new object[] { true, new byte[] { 0x71, 0x6F, 0x69, 0x66 } },
-        new object[] { true, new byte[] { 0x71, 0x6F, 0x69, 0x66, 1, 2, 3, 4 } },
-    };
+    public static TheoryData<bool, byte[]> FileValidityTestSet
+        => new()
+        {
+            { false, [] },
+            { false, [0, 0, 0, 0, 0, 0] },
+            { false, [255, 38, 252, 55, 127, 0, 0, 0] },
+            { false, [0x71, 0x6F] },
+            { false, [0x71, 0x6F, 0x69, 0xFF, 0x12] },
+            { true,  [0x71, 0x6F, 0x69, 0x66] },
+            { true,  [0x71, 0x6F, 0x69, 0x66, 1, 2, 3, 4] },
+        };
 
     [Theory]
     [MemberData(nameof(FileValidityTestSet))]
@@ -24,16 +25,17 @@ public class QoiDecoderTest
         Check.That(QoiDecoder.IsQoiImage(stream)).IsEqualTo(isValid);
     }
 
-    public static object[][] ImageTestSet = new object[][]
-    {
-        new object[] { GetBlankImage() },
-        new object[] { GetRandomArgbImage() },
-        new object[] { GetMonochromeStripedImage() },
-        new object[] { GetRandomStripedImage() },
-        new object[] { GetRandomSimpleImage() },
-        new object[] { GetShadedImage() },
-        new object[] { GetShadedImage(3) },
-    };
+    public static TheoryData<QoiImage> ImageTestSet
+        => new()
+        {
+            { GetBlankImage() },
+            { GetRandomArgbImage() },
+            { GetMonochromeStripedImage() },
+            { GetRandomStripedImage() },
+            { GetRandomSimpleImage() },
+            { GetShadedImage() },
+            { GetShadedImage(3) },
+        };
 
     [Theory]
     [MemberData(nameof(ImageTestSet))]
@@ -78,7 +80,7 @@ public class QoiDecoderTest
 
     private static QoiImage GetMonochromeStripedImage(int width = 8, int height = 6)
     {
-        QoiColor[] colors = { GetRandomColor(), GetRandomColor() };
+        QoiColor[] colors = [GetRandomColor(), GetRandomColor()];
         QoiColor[] pixels = new QoiColor[width * height];
         int pixelIndex = 0;
         for (int y = 0; y < height; y++)
@@ -146,14 +148,4 @@ public class QoiDecoderTest
         Random.Shared.NextBytes(bytes);
         return QoiColor.FromArgb(bytes[0], bytes[1], bytes[2], bytes[3]);
     }
-
-    /*
-    TODO:
-    - MAJ le package nuget QOI.Core en le passant en 2.0.0 (breaking change)
-    - Mettre les autres projets sur nuget
-    - rapatrier des tests ici
-    - profiler le code pour voir s'il y a des gains de perfs facilement atteignables
-    - faire un Encoder/decoder en ligne de commande et le publier sur NuGet
-    - réfléchir si on peut faire un rendre le decoder streamable (sans alouer un gros tableau)
-     */
 }

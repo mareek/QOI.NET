@@ -4,18 +4,12 @@ using System.Linq;
 
 namespace QOI.Viewer;
 
-internal class SimpleCache<T>
+internal class SimpleCache<T>(int size)
 {
-    private readonly int _size;
-    private readonly Dictionary<string, (int order, T value)> _cache = new();
+    private readonly int _size = size;
+    private readonly Dictionary<string, (int order, T value)> _cache = [];
 
-    private int _order;
-
-    public SimpleCache(int size)
-    {
-        _size = size;
-        _order = 0;
-    }
+    private int _order = 0;
 
     public T GetOrAdd(string key, Func<string, T> valueFactory)
     {
